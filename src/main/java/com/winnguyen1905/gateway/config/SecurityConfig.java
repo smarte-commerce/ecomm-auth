@@ -17,7 +17,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
   @Bean
   SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
-      CustomAuthenticationEntryPoint authenticationEntryPoint) {
+  CustomServerAuthenticationEntryPoint serverAuthenticationEntryPoint) {
     return http
         .csrf(c -> c.disable())
         .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
@@ -37,7 +37,7 @@ public class SecurityConfig {
         .oauth2ResourceServer(
             (oauth2) -> oauth2
                 .jwt(Customizer.withDefaults())
-                .authenticationEntryPoint())
+                .authenticationEntryPoint(serverAuthenticationEntryPoint))
         .build();
   }
 
