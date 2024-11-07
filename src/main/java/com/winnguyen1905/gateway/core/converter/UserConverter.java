@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 
 import com.winnguyen1905.gateway.core.model.User;
 import com.winnguyen1905.gateway.core.model.request.RegisterRequest;
-import com.winnguyen1905.gateway.persistence.entity.ECustomer;
-import com.winnguyen1905.gateway.persistence.entity.EShop;
-import com.winnguyen1905.gateway.persistence.entity.EUser;
+import com.winnguyen1905.gateway.persistance.entity.ECustomer;
+import com.winnguyen1905.gateway.persistance.entity.EShop;
+import com.winnguyen1905.gateway.persistance.entity.EUser;
 
 @Component
 public class UserConverter {

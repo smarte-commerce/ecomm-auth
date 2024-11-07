@@ -1,4 +1,4 @@
-package com.winnguyen1905.gateway.persistence.repository.specification;
+package com.winnguyen1905.gateway.persistance.repository.specification;
 
 import java.util.List;
 import java.util.UUID;

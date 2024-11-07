@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.winnguyen1905.gateway.core.model.User;
 import com.winnguyen1905.gateway.core.model.response.AuthResponse;
-import com.winnguyen1905.gateway.persistence.entity.EUser;
+import com.winnguyen1905.gateway.persistance.entity.EUser;
 
 @Component
 public class AuthenResponseConverter {

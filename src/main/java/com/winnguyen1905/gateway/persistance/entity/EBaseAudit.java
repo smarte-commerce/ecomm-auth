@@ -1,4 +1,4 @@
-package com.winnguyen1905.gateway.persistence.entity;
+package com.winnguyen1905.gateway.persistance.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

@@ -5,19 +5,19 @@ import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
 
-import com.winnguyen1905.gateway.model.PermissionDTO;
-import com.winnguyen1905.gateway.model.request.SearchPermissionRequest;
-import com.winnguyen1905.gateway.model.response.PaginationResponse;
-
+import com.winnguyen1905.gateway.core.model.Permission;
+import com.winnguyen1905.gateway.core.model.request.SearchPermissionRequest;
+import com.winnguyen1905.gateway.core.model.response.PagedResponse;
+ 
 public interface IPermissionService {
-    PaginationResponse<PermissionDTO> handleGetPermissions(SearchPermissionRequest permissionSearchRequest,
-            Pageable pageable);
 
-    PermissionDTO handleGetPermissionById(UUID id);
+    Permission handleGetPermissionById(UUID id);
 
-    PermissionDTO handleCreatePermission(PermissionDTO permissionDTO);
+    Permission handleCreatePermission(Permission permissionDTO);
 
-    PermissionDTO handleUpdatePermission(PermissionDTO permissionDTO);
+    Permission handleUpdatePermission(Permission permissionDTO);
 
     void handleDeletePermission(List<UUID> ids);
+
+    PagedResponse<Permission> handleGetPermissions(SearchPermissionRequest permissionSearchRequest, Pageable pageable);
 }

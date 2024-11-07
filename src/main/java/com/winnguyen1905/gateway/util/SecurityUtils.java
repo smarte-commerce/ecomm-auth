@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,9 +18,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class SecurityUtils {
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS256;
-
-    @Value("${techstore.jwt.access_token-validity-in-seconds}")
-    private String jwtExpiration;
 
     public static Optional<List<String>> getCurrentUsersPermissions() {
         SecurityContext securityContext = SecurityContextHolder.getContext();

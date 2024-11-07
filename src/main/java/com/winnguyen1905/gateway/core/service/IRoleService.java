@@ -3,17 +3,16 @@ package com.winnguyen1905.gateway.core.service;
 import java.util.List;
 import java.util.UUID;
 
-import com.winnguyen1905.gateway.model.RoleDTO;
+import com.winnguyen1905.gateway.core.model.Role;
 
 public interface IRoleService {
-    // RoleDTO handleGetRoles(RoleSearchRequest RoleSearchRequest, Pageable
+    // Role handleGetRoles(RoleSearchRequest RoleSearchRequest, Pageable
     // pageable);
+    Role handleGetRoleById(UUID id);
 
-    RoleDTO handleGetRoleById(UUID id);
+    Role handleCreateRole(Role roleDTO);
 
-    RoleDTO handleCreateRole(RoleDTO roleDTO);
-
-    RoleDTO handleUpdateRole(RoleDTO roleDTO);
+    Role handleUpdateRole(Role roleDTO);
 
     void handleDeleteRoles(List<UUID> ids);
 }

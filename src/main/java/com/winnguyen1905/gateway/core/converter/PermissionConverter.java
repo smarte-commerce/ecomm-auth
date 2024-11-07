@@ -8,8 +8,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import com.winnguyen1905.gateway.core.model.request.SearchPermissionRequest;
-import com.winnguyen1905.gateway.persistence.entity.EPermission; 
-import com.winnguyen1905.gateway.persistence.repository.specification.QuerySpecification;
+import com.winnguyen1905.gateway.persistance.entity.EPermission;
+import com.winnguyen1905.gateway.persistance.repository.specification.QuerySpecification;
 
 
 @Component

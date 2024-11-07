@@ -1,22 +1,26 @@
 package com.winnguyen1905.gateway.exception;
 
-import org.springframework.http.HttpStatus;
-
 import lombok.Getter;
 import lombok.Setter;
+import lombok.AllArgsConstructor;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class BaseException extends RuntimeException {
+    private String message;
+    private Integer code;
+    private Object error;
 
-    private HttpStatus status;
-    private ErrorResponse errorResponse;
-    private String[] args;
-
-    protected BaseException(HttpStatus status,ErrorResponse errorResponse) {
-        super(errorResponse.getMessage());
-        this.status = status;
-        this.errorResponse = errorResponse;
+    public BaseException(String message) {
+        this.message = message;
+        this.code = 400;
+        this.error = "Exception occurs";
     }
 
+    public BaseException(String message, int code) {
+        this.message = message;
+        this.code = code;
+        this.error = "Exception occurs";
+    }
 }

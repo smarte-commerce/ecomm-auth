@@ -23,27 +23,27 @@ public class SecurityConfig {
     "/storage/**", "/api/v1/products/**"};
 
     return http
-        .csrf(c -> c.disable())
-        .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
-        .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-        // .authenticationManager(authenticationManager)
-        // .httpBasic()
-        // .disable()
-        .authorizeExchange(
-            authorizeExchangeSpec -> authorizeExchangeSpec
-                .pathMatchers(whiteList).permitAll()
-                .pathMatchers("/ws/events").permitAll()
-                .pathMatchers("/auth/**", "/stripe/**", "/swagger-ui/**", "/api-docs/**", "/webjars/**").permitAll()
-                .pathMatchers("/admin/**")
-                .hasAnyAuthority("ADMIN", "ROLE_ADMIN")
-                .anyExchange().authenticated()
-          // .addFilterBefore(webFilter, SecurityWebFiltersOrder.HTTP_BASIC)
-        )
-        .oauth2ResourceServer(
-            (oauth2) -> oauth2
-                .jwt(Customizer.withDefaults())
-                .authenticationEntryPoint(serverAuthenticationEntryPoint))
-        .build();
+      .csrf(c -> c.disable())
+      .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
+      .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+      // .authenticationManager(authenticationManager)
+      // .httpBasic()
+      // .disable()
+      .authorizeExchange(
+          authorizeExchangeSpec -> authorizeExchangeSpec
+              .pathMatchers(whiteList).permitAll()
+              .pathMatchers("/ws/events").permitAll()
+              .pathMatchers("/auth/**", "/stripe/**", "/swagger-ui/**", "/api-docs/**", "/webjars/**").permitAll()
+              .pathMatchers("/admin/**")
+              .hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+              .anyExchange().authenticated()
+        // .addFilterBefore(webFilter, SecurityWebFiltersOrder.HTTP_BASIC)
+      )
+      .oauth2ResourceServer(
+          (oauth2) -> oauth2
+              .jwt(Customizer.withDefaults())
+              .authenticationEntryPoint(serverAuthenticationEntryPoint))
+      .build();
   }
 
   @Bean

@@ -1,4 +1,4 @@
-package com.winnguyen1905.gateway.persistence.repository;
+package com.winnguyen1905.gateway.persistance.repository;
 
 import java.util.List;
 import java.util.UUID;
@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import com.winnguyen1905.gateway.persistence.entity.EPermission;
+import com.winnguyen1905.gateway.persistance.entity.EPermission;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<EPermission, UUID>, JpaSpecificationExecutor<EPermission> {

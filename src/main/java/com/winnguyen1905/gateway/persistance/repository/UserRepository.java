@@ -1,4 +1,4 @@
-package com.winnguyen1905.gateway.persistence.repository;
+package com.winnguyen1905.gateway.persistance.repository;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.winnguyen1905.gateway.persistence.entity.EUser;
+import com.winnguyen1905.gateway.persistance.entity.EUser;
 
 @Repository
 public interface UserRepository extends JpaRepository<EUser, UUID> {
