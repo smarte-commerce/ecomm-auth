@@ -33,9 +33,9 @@ public class CustomServerAuthenticationEntryPoint implements ServerAuthenticatio
                 .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .message("Authentication failed, please check your token")
                 .error(
-                        Optional.ofNullable(authException.getCause())
-                                .map(Throwable::getMessage)
-                                .orElse(authException.getMessage()))
+                    Optional.ofNullable(authException.getCause())
+                        .map(Throwable::getMessage)
+                        .orElse(authException.getMessage()))
                 .build();
 
         return exchange.getResponse().writeWith(

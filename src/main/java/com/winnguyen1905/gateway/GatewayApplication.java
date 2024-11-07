@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 
-@EnableWebFlux
 @Configuration
+@EnableWebFlux
 @SpringBootApplication
 public class GatewayApplication {
 
