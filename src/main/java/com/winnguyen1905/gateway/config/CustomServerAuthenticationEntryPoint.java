@@ -12,7 +12,7 @@ import org.springframework.web.server.ServerWebExchange;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.winnguyen1905.gateway.model.response.RestResponse;
+import com.winnguyen1905.gateway.core.model.response.RestResponse;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;

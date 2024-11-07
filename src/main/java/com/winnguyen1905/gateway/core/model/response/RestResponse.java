@@ -1,6 +1,6 @@
-package com.winnguyen1905.gateway.model.response;
+package com.winnguyen1905.gateway.core.model.response;
 
-import com.winnguyen1905.gateway.model.AbstractModel;
+import com.winnguyen1905.gateway.core.model.AbstractModel;
 
 import lombok.*;
 

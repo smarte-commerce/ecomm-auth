@@ -1,4 +1,4 @@
-package com.winnguyen1905.gateway.model.request;
+package com.winnguyen1905.gateway.core.model.request;
 
 import java.util.List;
 import java.util.UUID;

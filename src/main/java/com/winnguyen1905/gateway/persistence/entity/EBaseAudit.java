@@ -13,8 +13,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.time.Instant;
 import java.util.Objects;
 
@@ -23,11 +21,9 @@ import java.util.Objects;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class EBaseAudit extends EBase {
-    @JsonIgnore
     @Column(name = "created_by", nullable = true)
     private String createdBy;
 
-    @JsonIgnore
     @Column(name = "updated_by", nullable = true)
     private String updatedBy;
 

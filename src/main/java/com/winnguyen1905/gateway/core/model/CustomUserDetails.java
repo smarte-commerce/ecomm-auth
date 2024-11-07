@@ -1,4 +1,4 @@
-package com.winnguyen1905.gateway.model;
+package com.winnguyen1905.gateway.core.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

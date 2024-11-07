@@ -1,9 +1,9 @@
-package com.winnguyen1905.gateway.model.response;
+package com.winnguyen1905.gateway.core.model.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.winnguyen1905.gateway.model.AbstractModel;
-import com.winnguyen1905.gateway.model.User;
+import com.winnguyen1905.gateway.core.model.AbstractModel;
+import com.winnguyen1905.gateway.core.model.User;
 
 import lombok.Builder;
 import lombok.Getter;
