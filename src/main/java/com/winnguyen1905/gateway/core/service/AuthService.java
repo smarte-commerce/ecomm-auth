@@ -6,18 +6,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.winnguyen1905.gateway.converter.AuthenResponseConverter;
-import com.winnguyen1905.gateway.converter.UserConverter;
-import com.winnguyen1905.gateway.entity.RoleEntity;
-import com.winnguyen1905.gateway.entity.UserEntity;
-import com.winnguyen1905.gateway.exception.CustomRuntimeException;
-import com.winnguyen1905.gateway.model.MyUserDetails;
-import com.winnguyen1905.gateway.model.request.LoginRequest;
-import com.winnguyen1905.gateway.model.request.RegisterRequest;
-import com.winnguyen1905.gateway.model.response.AuthResponse;
-import com.winnguyen1905.gateway.repository.RoleRepository;
-import com.winnguyen1905.gateway.repository.UserRepository;
-import com.winnguyen1905.gateway.service.IAuthService;
+import com.winnguyen1905.gateway.core.converter.AuthenResponseConverter;
+import com.winnguyen1905.gateway.core.model.CustomUserDetails;
+import com.winnguyen1905.gateway.core.model.request.LoginRequest;
+import com.winnguyen1905.gateway.core.model.response.AuthResponse;
 import com.winnguyen1905.gateway.util.AuthenticationUtils;
 import com.winnguyen1905.gateway.util.JwtUtils;
 
@@ -41,7 +33,7 @@ public class AuthService implements IAuthService {
     @Override
     public AuthResponse handleLogin(LoginRequest loginRequest) {
         Authentication authenticResults = this.authenticationUtils.authentication(loginRequest);
-        Pair<String, String> tokenPair = this.jwtUtils.createTokenPair((MyUserDetails) authenticResults.getPrincipal());
+        Pair<String, String> tokenPair = this.jwtUtils.createTokenPair((CustomUserDetails) authenticResults.getPrincipal());
         handleUpdateUsersRefreshToken(loginRequest.getUsername(), tokenPair.getSecond());
         return authenResponseConverter
                 .toAuthenResponse(

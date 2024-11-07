@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "roles")
-public class ERoll extends EBaseAudit {
+public class ERole extends EBaseAudit {
     @Column(name = "name", nullable = false)
     private String name;
 
