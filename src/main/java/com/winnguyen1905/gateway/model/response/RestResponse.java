@@ -8,8 +8,8 @@ import lombok.*;
 @Setter
 @Builder
 public class RestResponse<T> extends AbstractModel {
-    private Integer statusCode;
+    private T data;
     private String error;
     private Object message;
-    private T data;
+    private Integer statusCode;
 }

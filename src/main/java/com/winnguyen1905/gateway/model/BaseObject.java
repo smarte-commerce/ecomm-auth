@@ -9,20 +9,18 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class BaseObjectDTO<T> extends AbstractModel {
-    
-    private UUID id;
+public abstract class BaseObject<T> extends AbstractModel {
+    protected UUID id;
 
-    private String createdBy;
+    protected String createdBy;
 
-    private String updatedBy;
+    protected String updatedBy;
 
-    private Boolean isDeleted;
-
-    @JsonFormat(pattern = "HH-mm-ss a dd-MM-yyyy", timezone = "GMT+7")
-    private String createdDate;
+    protected Boolean isDeleted;
 
     @JsonFormat(pattern = "HH-mm-ss a dd-MM-yyyy", timezone = "GMT+7")
-    private String updatedDate;
+    protected String createdDate;
 
+    @JsonFormat(pattern = "HH-mm-ss a dd-MM-yyyy", timezone = "GMT+7")
+    protected String updatedDate;
 }

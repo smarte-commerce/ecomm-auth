@@ -26,7 +26,7 @@ import io.jsonwebtoken.JwtException;
 
 @Component
 public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
-  
+
   public GlobalExceptionHandler(
       ErrorAttributes errorAttributes,
       WebProperties.Resources resources,
@@ -53,14 +53,15 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     errorPropertiesMap.remove("timestamp");
 
     return ServerResponse.status(httpStatus)
-      .contentType(MediaType.APPLICATION_JSON)
-      .body(BodyInserters.fromValue(errorPropertiesMap));
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(BodyInserters.fromValue(errorPropertiesMap));
   }
 
   private HttpStatusCode determineHttpStatus(Throwable throwable) {
     if (throwable instanceof ResponseStatusException responseStatusException) {
       return responseStatusException.getStatusCode();
-    } else if (throwable instanceof JwtException || throwable instanceof BadCredentialsException || throwable instanceof UsernameNotFoundException) {
+    } else if (throwable instanceof JwtException || throwable instanceof BadCredentialsException
+        || throwable instanceof UsernameNotFoundException) {
       return HttpStatus.UNAUTHORIZED;
     } else if (throwable instanceof ResourceNotFoundException) {
       return HttpStatus.UNPROCESSABLE_ENTITY;
