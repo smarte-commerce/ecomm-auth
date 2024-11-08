@@ -15,5 +15,5 @@ public interface IAuthService {
 
     public Mono<Void> handleUpdateUsersRefreshToken(String username, String refreshToken);
 
-    public void handleLogout(String username);
+    public Mono<Void> handleLogout(String username);
 }

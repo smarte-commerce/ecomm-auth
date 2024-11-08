@@ -92,12 +92,13 @@ public class AuthService implements IAuthService {
   }
 
   @Override
-  public void handleLogout(String username) {
+  public Mono<Void> handleLogout(String username) {
     EUser user = this.userRepository.findUserByUsername(username)
         .orElseThrow(() -> new UsernameNotFoundException(
             "Not found user with username " + username));
     user.setRefreshToken(null);
     this.userRepository.save(user);
+    return Mono.empty();
   }
 
 }
