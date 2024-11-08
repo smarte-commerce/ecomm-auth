@@ -15,5 +15,5 @@ import lombok.Setter;
 @JsonInclude(value = Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public abstract class AbstractModel implements Serializable {
-    protected static final long serialVersionUID = 7213600440729202783L;
+  protected static final long serialVersionUID = 7213600440729202783L;
 }

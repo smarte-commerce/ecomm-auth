@@ -10,9 +10,9 @@ import lombok.Setter;
 @Getter
 @Builder
 public class SearchPermissionRequest extends BaseObject<SearchPermissionRequest> {
-    private String name;
-    private String code;
-    private String apiPath;
-    private String method;
-    private String module;
+  private String name;
+  private String code;
+  private String apiPath;
+  private String method;
+  private String module;
 }

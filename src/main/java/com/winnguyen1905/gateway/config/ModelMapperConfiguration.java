@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ModelMapperConfiguration {
+
   @Bean
   ModelMapper modelMapper() {
     List<String> excludes = List.of("createdDate", "updatedDate", "createdBy", "updatedBy");
@@ -28,4 +29,5 @@ public class ModelMapperConfiguration {
         });
     return modelMapper;
   }
+
 }

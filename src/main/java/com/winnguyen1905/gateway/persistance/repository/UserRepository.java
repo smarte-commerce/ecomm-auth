@@ -10,7 +10,9 @@ import com.winnguyen1905.gateway.persistance.entity.EUser;
 
 @Repository
 public interface UserRepository extends JpaRepository<EUser, UUID> {
-    Optional<EUser> findUserByUsername(String username);
-    Optional<EUser> findByIdOrUsername(UUID id, String username);
-    Optional<EUser> findByUsernameAndRefreshToken(String username, String refreshToken);
+  Optional<EUser> findUserByUsername(String username);
+
+  Optional<EUser> findByIdOrUsername(UUID id, String username);
+
+  Optional<EUser> findByUsernameAndRefreshToken(String username, String refreshToken);
 }

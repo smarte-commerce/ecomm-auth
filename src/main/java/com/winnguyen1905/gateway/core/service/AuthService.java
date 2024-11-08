@@ -55,28 +55,31 @@ public class AuthService implements IAuthService {
         .map(authentication -> {
           TokenPair tokenPair = this.jwtUtils.createTokenPair((CustomUserDetails) authentication.getPrincipal());
           handleUpdateUsersRefreshToken(loginRequest.getUsername(), tokenPair.getRefreshToken());
-          return this.authenResponseConverter
-              .toAuthenResponse(this.mapper.map(authentication, EUser.class), tokenPair);
+          return this.authenResponseConverter.toAuthenResponse(this.mapper.map(authentication, EUser.class), tokenPair);
         });
   }
 
   @Override
   public AuthResponse handleRegister(RegisterRequest registerRequest) {
+    this.userRepository
+        .findUserByUsername(registerRequest.getUsername())
+        .ifPresent(user -> {
+          throw new RuntimeException("User already exists");
+        });
     EUser user = this.userConverter.toUserEntity(registerRequest);
     ERole customerRole = this.mapper.map(this.roleRepository.findByCode("admin"), ERole.class);
     user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-    // user.setRole(customerRole);
-    user = this.userRepository.save(user);
     return this.authenResponseConverter.toAuthenResponse(user, null);
   }
 
   @Override
-  public void handleUpdateUsersRefreshToken(String username, String refreshToken) {
+  public Mono<Void> handleUpdateUsersRefreshToken(String username, String refreshToken) {
     EUser user = this.userRepository.findUserByUsername(username)
         .orElseThrow(() -> new UsernameNotFoundException(
             "Not found user with username " + username));
     user.setRefreshToken(refreshToken);
     this.userRepository.save(user);
+    return Mono.empty();
   }
 
   @Override

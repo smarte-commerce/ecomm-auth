@@ -13,30 +13,31 @@ import com.winnguyen1905.gateway.persistance.entity.EUser;
 @Component
 public class UserConverter {
 
-    @Autowired public ModelMapper modelMapper;
+  @Autowired
+  public ModelMapper modelMapper;
 
-    public <T> EUser toUserEntity(T object) {
-        EUser user = new EUser();
-        if(object instanceof RegisterRequest registerRequest) {
-            user = modelMapper.map(registerRequest, EUser.class);
-        } else {
+  public <T> EUser toUserEntity(T object) {
+    EUser user = new EUser();
+    if (object instanceof RegisterRequest registerRequest) {
+      user = modelMapper.map(registerRequest, EUser.class);
+    } else {
 
-        }
-        return user;
     }
+    return user;
+  }
 
-    public User toUser(EUser user) {
-        User User = modelMapper.map(user, User.class);
-        return User;
-    }
+  public User toUser(EUser user) {
+    User User = modelMapper.map(user, User.class);
+    return User;
+  }
 
-    public ECustomer toECustomer(EUser user) {
-        ECustomer customer = this.modelMapper.map(user, ECustomer.class);
-        return customer;
-    }
+  public ECustomer toECustomer(EUser user) {
+    ECustomer customer = this.modelMapper.map(user, ECustomer.class);
+    return customer;
+  }
 
-    public EShop toEShop(EUser user) {
-        EShop shop = this.modelMapper.map(user, EShop.class);
-        return shop;
-    }
+  public EShop toEShop(EUser user) {
+    EShop shop = this.modelMapper.map(user, EShop.class);
+    return shop;
+  }
 }

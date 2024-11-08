@@ -34,8 +34,8 @@ public class CustomServerAuthenticationEntryPoint implements ServerAuthenticatio
         .message("Authentication failed, please check your token")
         .error(
             Optional.ofNullable(authException.getCause())
-                .map(Throwable::getMessage)
-                .orElse(authException.getMessage()))
+              .map(Throwable::getMessage)
+              .orElse(authException.getMessage()))
         .build();
 
     return exchange.getResponse().writeWith(

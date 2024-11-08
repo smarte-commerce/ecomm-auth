@@ -11,6 +11,7 @@ import com.winnguyen1905.gateway.persistance.entity.EUser;
 import com.winnguyen1905.gateway.persistance.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +28,8 @@ public class UserService implements IUserService {
 
     @Override
     public User handleGetUserById(UUID id) {
-        EUser user = this.userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("Not found user by id " + id));
+      EUser user = this.userRepository.findById(id)
+            .orElseThrow(() -> (new UsernameNotFoundException("Username does not exist")));
         return this.modelMapper.map(user, User.class);
     }
 
