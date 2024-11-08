@@ -13,7 +13,7 @@ public interface IAuthService {
 
     public AuthResponse handleGetAuthenResponseByUsernameAndRefreshToken(String username, String refreshToken);
 
-    public Void handleUpdateUsersRefreshToken(String username, String refreshToken);
+    public void handleUpdateUsersRefreshToken(String username, String refreshToken);
 
-    public Void handleLogout(String username);
+    public void handleLogout(String username);
 }

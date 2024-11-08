@@ -5,7 +5,6 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.winnguyen1905.gateway.core.model.MyUserDetails;
 import com.winnguyen1905.gateway.persistance.repository.UserRepository;
@@ -13,7 +12,6 @@ import com.winnguyen1905.gateway.persistance.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@Transactional
 @RequiredArgsConstructor
 @Component("reactiveUserDetailsService")
 public class CustomUserDetailsService implements ReactiveUserDetailsService {

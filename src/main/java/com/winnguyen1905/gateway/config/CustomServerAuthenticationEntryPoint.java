@@ -20,33 +20,33 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class CustomServerAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
-    private final ObjectMapper objectMapper;
-    private final ServerAuthenticationEntryPoint delegate = new BearerTokenServerAuthenticationEntryPoint();
+  private final ObjectMapper objectMapper;
+  private final ServerAuthenticationEntryPoint delegate = new BearerTokenServerAuthenticationEntryPoint();
 
-    @Override
-    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException authException) {
-        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
-        this.delegate.commence(exchange, authException);
+  @Override
+  public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException authException) {
+    this.delegate.commence(exchange, authException);
+    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+    exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-        RestResponse<Object> res = RestResponse.builder()
-                .statusCode(HttpStatus.UNAUTHORIZED.value())
-                .message("Authentication failed, please check your token")
-                .error(
-                    Optional.ofNullable(authException.getCause())
-                        .map(Throwable::getMessage)
-                        .orElse(authException.getMessage()))
-                .build();
+    RestResponse<Object> res = RestResponse.builder()
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message("Authentication failed, please check your token")
+        .error(
+            Optional.ofNullable(authException.getCause())
+                .map(Throwable::getMessage)
+                .orElse(authException.getMessage()))
+        .build();
 
-        return exchange.getResponse().writeWith(
-                Mono.fromSupplier(() -> {
-                    try {
-                        return exchange.getResponse()
-                                .bufferFactory()
-                                .wrap(objectMapper.writeValueAsBytes(res));
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException("Error writing authentication error response", e);
-                    }
-                }));
-    }
+    return exchange.getResponse().writeWith(
+        Mono.fromSupplier(() -> {
+          try {
+            return exchange.getResponse()
+                .bufferFactory()
+                .wrap(objectMapper.writeValueAsBytes(res));
+          } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error writing authentication error response", e);
+          }
+        }));
+  }
 }

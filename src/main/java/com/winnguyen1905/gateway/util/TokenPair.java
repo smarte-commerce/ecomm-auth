@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.winnguyen1905.gateway.core.model.AbstractModel;
 
 import lombok.*;
+
 @Getter
 @Setter
 @Builder

@@ -11,8 +11,7 @@ import lombok.*;
 public class LoginRequest extends AbstractModel {
     @Pattern(
         regexp = "^[a-zA-Z0-9]{8,20}$",
-        message = "username must be of 8 to 20 length with no special characters"
-    )
+        message = "username must be of 8 to 20 length with no special characters" )
     private String username;
 
     @NotBlank(message = "password invalid")
