@@ -30,8 +30,10 @@ public class RestResponseFilter implements ResponseBodyAdvice<Object> {
       Object body, MethodParameter returnType, MediaType selectedContentType,
       Class selectedConverterType, ServerHttpRequest request,
       ServerHttpResponse response) {
+
     if (body == null || body instanceof Resource)
       return body;
+
     HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
     int statusCode = servletResponse.getStatus();
     RestResponse<Object> restResponse = RestResponse.builder().statusCode(statusCode).build();
@@ -42,6 +44,7 @@ public class RestResponseFilter implements ResponseBodyAdvice<Object> {
       if (returnType.getMethodAnnotation(MetaMessage.class) instanceof MetaMessage message)
         restResponse.setMessage(message.message());
     }
+
     return restResponse;
   }
 

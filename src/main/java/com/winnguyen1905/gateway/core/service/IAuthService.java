@@ -7,13 +7,13 @@ import com.winnguyen1905.gateway.core.model.response.AuthResponse;
 import reactor.core.publisher.Mono;
 
 public interface IAuthService {
-    public Mono<AuthResponse> handleLogin(LoginRequest loginRequest);
+  public Mono<AuthResponse> handleLogin(LoginRequest loginRequest);
 
-    public AuthResponse handleRegister(RegisterRequest registerRequest);
+  public AuthResponse handleRegister(RegisterRequest registerRequest);
 
-    public AuthResponse handleGetAuthenResponseByUsernameAndRefreshToken(String username, String refreshToken);
+  public AuthResponse handleGetAuthenResponseByUsernameAndRefreshToken(String username, String refreshToken);
 
-    public Mono<Void> handleUpdateUsersRefreshToken(String username, String refreshToken);
+  public Mono<Void> handleUpdateUsersRefreshToken(String username, String refreshToken);
 
-    public Mono<Void> handleLogout(String username);
+  public Mono<Void> handleLogout(String username);
 }

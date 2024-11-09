@@ -16,34 +16,34 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
   @Bean
   SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
-  CustomServerAuthenticationEntryPoint serverAuthenticationEntryPoint) {
+      CustomServerAuthenticationEntryPoint serverAuthenticationEntryPoint) {
 
-  String[] whiteList = {
-    "/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh", 
-    "/storage/**", "/api/v1/products/**"};
+    String[] whiteList = {
+        "/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh",
+        "/storage/**", "/api/v1/products/**" };
 
     return http
-      .csrf(c -> c.disable())
-      .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
-      .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-      // .authenticationManager(authenticationManager)
-      // .httpBasic()
-      // .disable()
-      .authorizeExchange(
-          authorizeExchangeSpec -> authorizeExchangeSpec
-              .pathMatchers(whiteList).permitAll()
-              .pathMatchers("/ws/events").permitAll()
-              .pathMatchers("/auth/**", "/stripe/**", "/swagger-ui/**", "/api-docs/**", "/webjars/**").permitAll()
-              .pathMatchers("/admin/**")
-              .hasAnyAuthority("ADMIN", "ROLE_ADMIN")
-              .anyExchange().authenticated()
+        .csrf(c -> c.disable())
+        .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
+        .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+        // .authenticationManager(authenticationManager)
+        // .httpBasic()
+        // .disable()
+        .authorizeExchange(
+            authorizeExchangeSpec -> authorizeExchangeSpec
+                .pathMatchers(whiteList).permitAll()
+                .pathMatchers("/ws/events").permitAll()
+                .pathMatchers("/auth/**", "/stripe/**", "/swagger-ui/**", "/api-docs/**", "/webjars/**").permitAll()
+                .pathMatchers("/admin/**")
+                .hasAnyAuthority("ADMIN", "ROLE_ADMIN")
+                .anyExchange().authenticated()
         // .addFilterBefore(webFilter, SecurityWebFiltersOrder.HTTP_BASIC)
-      )
-      .oauth2ResourceServer(
-          (oauth2) -> oauth2
-              .jwt(Customizer.withDefaults())
-              .authenticationEntryPoint(serverAuthenticationEntryPoint))
-      .build();
+        )
+        .oauth2ResourceServer(
+            (oauth2) -> oauth2
+                .jwt(Customizer.withDefaults())
+                .authenticationEntryPoint(serverAuthenticationEntryPoint))
+        .build();
   }
 
   @Bean
@@ -54,7 +54,8 @@ public class SecurityConfig {
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
     configuration.setAllowCredentials(true);
     configuration.addAllowedHeader("*");
-    configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "Accept", "x-no-retry", "x-api-key"));
+    configuration
+        .setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "Accept", "x-no-retry", "x-api-key"));
     configuration.setMaxAge(3600L);
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);

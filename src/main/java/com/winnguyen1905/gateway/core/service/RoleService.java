@@ -21,38 +21,38 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RoleService implements IRoleService {
 
-    private final RoleRepository roleRepository;
-    private final ModelMapper modelMapper;
-    private final PermissionRepository permissionRepository;
+  private final RoleRepository roleRepository;
+  private final ModelMapper modelMapper;
+  private final PermissionRepository permissionRepository;
 
-    @Override
-    public Role handleGetRoleById(UUID id) {
-        ERole role = this.roleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found role with id " + id.toString()));
-        return this.modelMapper.map(role, Role.class);
-    }
+  @Override
+  public Role handleGetRoleById(UUID id) {
+    ERole role = this.roleRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Not found role with id " + id.toString()));
+    return this.modelMapper.map(role, Role.class);
+  }
 
-    @Override
-    public Role handleCreateRole(Role roleDTO) {
-        ERole role = this.modelMapper.map(roleDTO, ERole.class);
-        List<EPermission> permissions = this.permissionRepository.findByCodeIn(roleDTO.getPermissionCodes());
-        role.setPermissions(Set.copyOf(permissions));
-        role = this.roleRepository.save(role);
-        return this.modelMapper.map(role, Role.class);
-    }
+  @Override
+  public Role handleCreateRole(Role roleDTO) {
+    ERole role = this.modelMapper.map(roleDTO, ERole.class);
+    List<EPermission> permissions = this.permissionRepository.findByCodeIn(roleDTO.getPermissionCodes());
+    role.setPermissions(Set.copyOf(permissions));
+    role = this.roleRepository.save(role);
+    return this.modelMapper.map(role, Role.class);
+  }
 
-    @Override
-    public Role handleUpdateRole(Role roleDTO) {
-        ERole beModifiedRole = this.roleRepository.findById(roleDTO.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Not found role with id " + roleDTO.getId().toString()));
-        ERole newRoleData = this.modelMapper.map(roleDTO, ERole.class);
-        MergeUtils.mergeObject(newRoleData, beModifiedRole);
-        beModifiedRole = this.roleRepository.save(beModifiedRole);
-        return this.modelMapper.map(beModifiedRole, Role.class);
-    }
+  @Override
+  public Role handleUpdateRole(Role roleDTO) {
+    ERole beModifiedRole = this.roleRepository.findById(roleDTO.getId())
+        .orElseThrow(() -> new ResourceNotFoundException("Not found role with id " + roleDTO.getId().toString()));
+    ERole newRoleData = this.modelMapper.map(roleDTO, ERole.class);
+    MergeUtils.mergeObject(newRoleData, beModifiedRole);
+    beModifiedRole = this.roleRepository.save(beModifiedRole);
+    return this.modelMapper.map(beModifiedRole, Role.class);
+  }
 
-    @Override
-    public void handleDeleteRoles(List<UUID> ids) {
-        this.roleRepository.deleteByIdIn(ids);
-    }
+  @Override
+  public void handleDeleteRoles(List<UUID> ids) {
+    this.roleRepository.deleteByIdIn(ids);
+  }
 }

@@ -31,30 +31,30 @@ import com.winnguyen1905.gateway.core.service.IAuthService;
 import com.winnguyen1905.gateway.core.service.IUserService;
 import com.winnguyen1905.gateway.util.CookieUtils;
 import com.winnguyen1905.gateway.util.MetaMessage;
-import com.winnguyen1905.gateway.util.SecurityUtils;
+import com.winnguyen1905.gateway.util.SecurityHolderUtils;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("${release.api.prefix}/auth")
 public class AuthController {
 
-  private final IAuthService authService;
-  private final IUserService userService;
   private final JwtDecoder jwtDecoder;
   private final CookieUtils cookieUtils;
+  private final IAuthService authService;
+  private final IUserService userService;
 
   @PostMapping("/login")
   @MetaMessage(message = "Login success")
-  public Mono<ResponseEntity<Mono<AuthResponse>>> login(@RequestBody @Valid LoginRequest loginRequest) {
-    return this.authService.handleLogin(loginRequest)
-        .subscribeOn(Schedulers.immediate())
-        .map(auth -> {
-          return ResponseEntity.ok()
-              .header(HttpHeaders.SET_COOKIE,
-                  this.cookieUtils.createCookie(SystemConstant.REFRESH_TOKEN, auth.getTokens().getRefreshToken())
-                      .toString())
-              .body(this.authService.handleLogin(loginRequest));
-        }).switchIfEmpty(Mono.error(new RuntimeException("User is not active")));
+  public ResponseEntity<Mono<AuthResponse>> login(@RequestBody @Valid LoginRequest loginRequest) {
+    Mono<AuthResponse> authResponse = this.authService.handleLogin(loginRequest);
+    return ResponseEntity.ok()
+        .header(HttpHeaders.SET_COOKIE,
+            this.cookieUtils
+                .createCookie(SystemConstant.REFRESH_TOKEN,
+                    authResponse.map(e -> e.getTokens().getRefreshToken())
+                        .switchIfEmpty(Mono.error(new RuntimeException("User is not active"))).toString())
+                .toString())
+        .body(authResponse);
   }
 
   @PostMapping("/register")
@@ -80,7 +80,7 @@ public class AuthController {
   @GetMapping("/account")
   @MetaMessage(message = "Get my account success")
   public ResponseEntity<AuthResponse> getAccount() {
-    String username = SecurityUtils.getCurrentUserLogin()
+    String username = SecurityHolderUtils.getCurrentUserLogin()
         .orElseThrow(() -> new UsernameNotFoundException("Not found username"));
     AuthResponse authenResponse = AuthResponse.builder().user(this.userService.handleGetUserByUsername(username))
         .build();
@@ -88,12 +88,11 @@ public class AuthController {
   }
 
   @PostMapping("/logout")
-  public Mono<ResponseEntity<Mono<Void>>> logout() {
-    String username = SecurityUtils.getCurrentUserLogin()
+  public ResponseEntity<Mono<Void>> logout() {
+    String username = SecurityHolderUtils.getCurrentUserLogin()
         .orElseThrow(() -> new UsernameNotFoundException("Not found username"));
-    return this.authService.handleLogout(username)
-        .map(e -> ResponseEntity.status(HttpStatus.NO_CONTENT)
-            .header(HttpHeaders.SET_COOKIE, this.cookieUtils.deleteCookie(SystemConstant.REFRESH_TOKEN).toString())
-            .body(Mono.empty()));
+    return ResponseEntity.status(HttpStatus.NO_CONTENT)
+        .header(HttpHeaders.SET_COOKIE, this.cookieUtils.deleteCookie(SystemConstant.REFRESH_TOKEN).toString())
+        .body(this.authService.handleLogout(username));
   }
 }

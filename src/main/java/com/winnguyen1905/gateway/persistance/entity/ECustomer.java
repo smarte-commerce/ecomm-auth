@@ -1,9 +1,7 @@
 package com.winnguyen1905.gateway.persistance.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 

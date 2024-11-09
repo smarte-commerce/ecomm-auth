@@ -1,7 +1,6 @@
 package com.winnguyen1905.gateway.core.service;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -9,11 +8,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.winnguyen1905.gateway.config.CustomReactiveAuthManager;
 import com.winnguyen1905.gateway.core.converter.AuthenResponseConverter;
 import com.winnguyen1905.gateway.core.converter.UserConverter;
 import com.winnguyen1905.gateway.core.model.CustomUserDetails;
-import com.winnguyen1905.gateway.core.model.User;
 import com.winnguyen1905.gateway.core.model.request.LoginRequest;
 import com.winnguyen1905.gateway.core.model.request.RegisterRequest;
 import com.winnguyen1905.gateway.core.model.response.AuthResponse;
@@ -21,7 +18,6 @@ import com.winnguyen1905.gateway.persistance.entity.ERole;
 import com.winnguyen1905.gateway.persistance.entity.EUser;
 import com.winnguyen1905.gateway.persistance.repository.RoleRepository;
 import com.winnguyen1905.gateway.persistance.repository.UserRepository;
-import com.winnguyen1905.gateway.util.AuthenticationUtils;
 import com.winnguyen1905.gateway.util.JwtUtils;
 import com.winnguyen1905.gateway.util.TokenPair;
 

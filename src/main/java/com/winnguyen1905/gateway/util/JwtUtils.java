@@ -49,7 +49,8 @@ public class JwtUtils {
 
   public TokenPair createTokenPair(CustomUserDetails userDetails) {
     userDetails.setPassword(null);
-    Instant now = Instant.now(),
+    Instant 
+        now = Instant.now(),
         accessTokenValidity = now.plus(Long.parseLong(jwtAccessTokenExpiration), ChronoUnit.SECONDS),
         refreshTokenValidity = now.plus(Long.parseLong(jwtRefreshTokenExpiration), ChronoUnit.SECONDS);
     JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
