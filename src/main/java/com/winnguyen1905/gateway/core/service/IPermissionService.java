@@ -13,7 +13,7 @@ public interface IPermissionService {
 
     Permission handleGetPermissionById(UUID id);
 
-    Permission handleCreatePermission(Permission permissionDTO);
+    Permission handleCreatePermission(Permission permission);
 
     Permission handleUpdatePermission(Permission permissionDTO);
 

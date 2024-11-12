@@ -6,13 +6,13 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.winnguyen1905.gateway.persistance.entity.EUser;
+import com.winnguyen1905.gateway.persistance.entity.EUserCredentials;
 
 @Repository
-public interface UserRepository extends JpaRepository<EUser, UUID> {
-  Optional<EUser> findUserByUsername(String username);
+public interface UserRepository extends JpaRepository<EUserCredentials, UUID> {
+  Optional<EUserCredentials> findUserByUsername(String username);
 
-  Optional<EUser> findByIdOrUsername(UUID id, String username);
+  Optional<EUserCredentials> findByIdOrUsername(UUID id, String username);
 
-  Optional<EUser> findByUsernameAndRefreshToken(String username, String refreshToken);
+  Optional<EUserCredentials> findByUsernameAndRefreshToken(String username, String refreshToken);
 }

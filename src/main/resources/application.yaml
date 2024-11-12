@@ -1,0 +1,157 @@
+# server:
+#   port: 8091
+#   error:
+#     include-message: never
+
+# management:
+#   endpoint:
+#     gateway:
+#       enabled: true
+
+# spring:
+#   main:
+#     allow-bean-definition-overriding=true
+#   #   config:
+# #     activate:
+# #       on-profile: dev
+#   cloud:
+#     gateway:
+#       routes:
+#         - id: ecommerce-user
+#           uri: http://localhost:8080/
+#           predicates:
+#             - Path=/user/**, /address/**, /user/*/**, /admin/user/**
+#           filters:
+#             - PrefixPath=/api
+#         - id: ecommerce-product
+#           uri: http://localhost:8081/
+#           predicates:
+#             - Path=/product/**, /category/**, /admin/**, /inventory/**, /brand/**
+#           filters:
+#             - PrefixPath=/api
+#         - id: ecommerce-cart
+#           uri: http://localhost:8082/
+#           predicates:
+#             - Path=/cart/**
+#           filters:
+#             - PrefixPath=/api
+#         - id: ecommerce-order
+#           uri: http://localhost:8083/
+#           predicates:
+#             - Path=/order/**, /stripe/**
+#           filters:
+#             - PrefixPath=/api
+
+#   datasource:
+#     url: jdbc:mysql://localhost:3306/ecommerce
+#     username: root
+#     password: 2905
+#     driver-class-name: org.mysql.Driver
+
+#   data:
+#     web:
+#       pageable:
+#         size-parameter: size
+#         max-page-size: 100
+#         one-indexed-parameters: true
+#         page-parameter: page
+#       sort:
+#         sort-parameter: sort
+#   jpa:
+#     database-platform: org.hibernate.dialect.MySQL8Dialect
+#     hibernate:
+#       ddl-auto: create-drop
+#     # properties:
+#     #   hibernate:
+#     #     dialect: org.hibernate.dialect.MySQL8Dialect
+#     #     "enable_lazy_load_no_trans": false
+#     #     "format_sql": true
+#     show-sql: false
+
+# logging:
+#   level:
+#     org:
+#       springframework:
+#         cloud:
+#           gateway: debug
+#     root: info
+
+# jwt:
+#   secret-key: hl4gDqBxBgOSDWqBlvwFYQInjYRGAdS4lUT7Nf3Zk1nItoSQ9wSFDPU+kXHKcKUW/UKbpGv9bCsa9S/QsoFRHw==
+#   access_token-validity-in-seconds: 90000000z
+
+# springdoc:
+#   swagger-ui:
+#     path: /swagger-ui
+#     enabled: true
+#   api-docs:
+#     enabled: true
+#     path: /api-docs
+spring:
+  application:
+    name: technologystore
+  main:
+    web-application-type: reactive
+  datasource:
+    url: jdbc:mysql://localhost:3306/ecommerce
+    username: root
+    password: 2905
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        enable_lazy_load_no_trans: false
+        format_sql: true
+    show-sql: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+    web:
+      pageable:
+        size-parameter: size
+        max-page-size: 100
+        one-indexed-parameters: true
+        page-parameter: page
+      sort:
+        sort-parameter: sort
+
+  profiles:
+    active: dev
+
+  sql:
+    init:
+      mode: always
+
+server:
+  port: 8080
+  error:
+    include-message: never
+
+jwt:
+  base64-secret: hl4gDqBxBgOSDWqBlvwFYQInjYRGAdS4lUT7Nf3Zk1nItoSQ9wSFDPU+kXHKcKUW/UKbpGv9bCsa9S/QsoFRHw==
+  access_token-validity-in-seconds: 90000000
+  refresh_token-validity-in-seconds: 100000000
+
+release:
+  api:
+    prefix: /api/v1
+
+beta:
+  api:
+    prefix: /api/v2
+
+test:
+  api:
+    prefix: /api
+
+upload-file:
+  base-uri: file:///C:/my_projects/SPRING_BOOT/upload/

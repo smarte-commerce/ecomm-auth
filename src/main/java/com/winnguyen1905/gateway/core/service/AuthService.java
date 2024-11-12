@@ -15,7 +15,7 @@ import com.winnguyen1905.gateway.core.model.request.LoginRequest;
 import com.winnguyen1905.gateway.core.model.request.RegisterRequest;
 import com.winnguyen1905.gateway.core.model.response.AuthResponse;
 import com.winnguyen1905.gateway.persistance.entity.ERole;
-import com.winnguyen1905.gateway.persistance.entity.EUser;
+import com.winnguyen1905.gateway.persistance.entity.EUserCredentials;
 import com.winnguyen1905.gateway.persistance.repository.RoleRepository;
 import com.winnguyen1905.gateway.persistance.repository.UserRepository;
 import com.winnguyen1905.gateway.util.JwtUtils;
@@ -51,7 +51,8 @@ public class AuthService implements IAuthService {
         .map(authentication -> {
           TokenPair tokenPair = this.jwtUtils.createTokenPair((CustomUserDetails) authentication.getPrincipal());
           handleUpdateUsersRefreshToken(loginRequest.getUsername(), tokenPair.getRefreshToken());
-          return this.authenResponseConverter.toAuthenResponse(this.mapper.map(authentication, EUser.class), tokenPair);
+          return this.authenResponseConverter.toAuthenResponse(this.mapper.map(authentication, EUserCredentials.class),
+              tokenPair);
         });
   }
 
@@ -62,15 +63,16 @@ public class AuthService implements IAuthService {
         .ifPresent(user -> {
           throw new RuntimeException("User already exists");
         });
-    EUser user = this.userConverter.toUserEntity(registerRequest);
+    EUserCredentials customer = this.userConverter.toUserEntity(registerRequest);
     ERole customerRole = this.mapper.map(this.roleRepository.findByCode("admin"), ERole.class);
-    user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-    return this.authenResponseConverter.toAuthenResponse(user, null);
+    customer.setPassword(this.passwordEncoder.encode(customer.getPassword()));
+    customer.setRole(customerRole);
+    return this.authenResponseConverter.toAuthenResponse(customer, null);
   }
 
   @Override
   public Mono<Void> handleUpdateUsersRefreshToken(String username, String refreshToken) {
-    EUser user = this.userRepository.findUserByUsername(username)
+    EUserCredentials user = this.userRepository.findUserByUsername(username)
         .orElseThrow(() -> new UsernameNotFoundException(
             "Not found user with username " + username));
     user.setRefreshToken(refreshToken);
@@ -80,7 +82,7 @@ public class AuthService implements IAuthService {
 
   @Override
   public AuthResponse handleGetAuthenResponseByUsernameAndRefreshToken(String username, String refreshToken) {
-    EUser user = this.userRepository.findByUsernameAndRefreshToken(username, refreshToken)
+    EUserCredentials user = this.userRepository.findByUsernameAndRefreshToken(username, refreshToken)
         .orElseThrow(() -> new UsernameNotFoundException("Not found user with refresh token and username " + username));
     TokenPair tokenPair = this.jwtUtils.createTokenPair(this.mapper.map(user, CustomUserDetails.class));
     handleUpdateUsersRefreshToken(username, tokenPair.getRefreshToken());
@@ -89,7 +91,7 @@ public class AuthService implements IAuthService {
 
   @Override
   public Mono<Void> handleLogout(String username) {
-    EUser user = this.userRepository.findUserByUsername(username)
+    EUserCredentials user = this.userRepository.findUserByUsername(username)
         .orElseThrow(() -> new UsernameNotFoundException(
             "Not found user with username " + username));
     user.setRefreshToken(null);

@@ -1,7 +1,7 @@
 package com.winnguyen1905.gateway.core.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController; 
+import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -24,42 +24,44 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.winnguyen1905.gateway.common.SystemConstant;
+import com.winnguyen1905.gateway.core.model.Permission;
+import com.winnguyen1905.gateway.core.model.request.SearchPermissionRequest;
+import com.winnguyen1905.gateway.core.model.response.PagedResponse;
+import com.winnguyen1905.gateway.core.service.IPermissionService;
+
+import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("${release.api.prefix}/permissions")
+@RequestMapping("permissions")
 public class PermissionController {
-    @Autowired
-    private IPermissionService permissionService;
+  @Autowired
+  private IPermissionService permissionService;
 
-    @GetMapping
-    public ResponseEntity<PermissionDTO> getPermissions(
-        @ModelAttribute(SystemConstant.MODEL) SearchPermissionRequest permissionSearchRequest,
-        Pageable pageable
-    ) {
-        return ResponseEntity.ok().body(
-            this.permissionService.handleGetPermissions(permissionSearchRequest, pageable)
-        );
-    }
+  @GetMapping
+  public ResponseEntity<PagedResponse<Permission>> getPermissions(
+      @ModelAttribute(SystemConstant.MODEL) SearchPermissionRequest permissionSearchRequest,
+      Pageable pageable) {
+    return ResponseEntity.ok().body(
+        this.permissionService.handleGetPermissions(permissionSearchRequest, pageable));
+  }
 
-    @PostMapping
-    public ResponseEntity<PermissionDTO> createPermission(
-        @RequestBody PermissionDTO permissionDTO
-    ) throws Exception {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            this.permissionService.handleCreatePermission(permissionDTO)
-        );
-    }   
-    
-    @PutMapping
-    public ResponseEntity<PermissionDTO> updatePermission(@RequestBody PermissionDTO permissionDTO) {
-        return ResponseEntity.ok().body(this.permissionService.handleUpdatePermission(permissionDTO));
-    }
-    
-    @DeleteMapping("/{ids}")
-    public ResponseEntity<PermissionDTO> deletePermission(
-        @PathVariable List<UUID> ids
-    ) {
-        this.permissionService.handleDeletePermission(ids);
-        return ResponseEntity.noContent().build();
-    }
+  @PostMapping
+  public ResponseEntity<Permission> createPermission(
+      @RequestBody Permission permission) throws Exception {
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+        this.permissionService.handleCreatePermission(permission));
+  }
+
+  @PutMapping
+  public ResponseEntity<Permission> updatePermission(@RequestBody Permission permission) {
+    return ResponseEntity.ok().body(this.permissionService.handleUpdatePermission(permission));
+  }
+
+  @DeleteMapping("/{ids}")
+  public ResponseEntity<Permission> deletePermission(
+      @PathVariable List<UUID> ids) {
+    this.permissionService.handleDeletePermission(ids);
+    return ResponseEntity.noContent().build();
+  }
 }

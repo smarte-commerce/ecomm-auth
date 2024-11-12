@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.winnguyen1905.gateway.core.model.response.RestResponse;
-import com.winnguyen1905.gateway.util.MetaMessage;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -40,9 +39,9 @@ public class RestResponseFilter implements ResponseBodyAdvice<Object> {
     if (statusCode > 399)
       return body;
     else {
-      restResponse.setData((Object) body);
-      if (returnType.getMethodAnnotation(MetaMessage.class) instanceof MetaMessage message)
-        restResponse.setMessage(message.message());
+      // restResponse.setData((Object) body);
+      // if (returnType.getMethodAnnotation(MetaMessage.class) instanceof MetaMessage message)
+      //   restResponse.setMessage(message.message());
     }
 
     return restResponse;

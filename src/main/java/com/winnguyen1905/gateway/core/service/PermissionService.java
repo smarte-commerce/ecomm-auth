@@ -30,47 +30,48 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PermissionService implements IPermissionService {
 
-    private final ModelMapper mapper;
-    private final PermissionConverter permissionConverter;
-    private final PermissionRepository permissionRepository;
-    private final Type pagedResponseType = new TypeToken<PagedResponse<Permission>>() {}.getType();
+  private final ModelMapper mapper;
+  private final PermissionConverter permissionConverter;
+  private final PermissionRepository permissionRepository;
+  private final Type pagedResponseType = new TypeToken<PagedResponse<Permission>>() {}.getType();
 
-    @Override
-    public PagedResponse<Permission> handleGetPermissions(SearchPermissionRequest permissionSearchRequest, Pageable pageable) {
-        Specification<EPermission> spec = this.permissionConverter.toPermissionSpec(permissionSearchRequest);
-        Page<EPermission> permissions = this.permissionRepository.findAll(spec, pageable);
-        PagedResponse<Permission> permissionPaged = this.mapper.map(permissions, pagedResponseType);
-        permissionPaged.setPage((int) permissions.getNumber() + 1);
-        return permissionPaged;
-    }
+  @Override
+  public PagedResponse<Permission> handleGetPermissions(SearchPermissionRequest permissionSearchRequest,
+      Pageable pageable) {
+    Specification<EPermission> spec = this.permissionConverter.toPermissionSpec(permissionSearchRequest);
+    Page<EPermission> permissions = this.permissionRepository.findAll(spec, pageable);
+    PagedResponse<Permission> permissionPaged = this.mapper.map(permissions, pagedResponseType);
+    permissionPaged.setPage((int) permissions.getNumber() + 1);
+    return permissionPaged;
+  }
 
-    @Override
-    public Permission handleGetPermissionById(UUID id) {
-        return this.mapper.map(
-                this.permissionRepository.findById(id)
-                        .orElseThrow(() -> new NotFoundException("Not found permission by id " + id)),
-                Permission.class);
-    }
+  @Override
+  public Permission handleGetPermissionById(UUID id) {
+    return this.mapper.map(
+        this.permissionRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Not found permission by id " + id)),
+        Permission.class);
+  }
 
-    @Override
-    public Permission handleCreatePermission(Permission permissionDTO) {
-        EPermission permission = this.mapper.map(permissionDTO, EPermission.class);
-        permission = this.permissionRepository.save(permission);
-        return this.mapper.map(permission, Permission.class);
-    }
+  @Override
+  public Permission handleCreatePermission(Permission permission) {
+    EPermission ePermission = this.mapper.map(permission, EPermission.class);
+    ePermission = this.permissionRepository.save(ePermission);
+    return this.mapper.map(ePermission, Permission.class);
+  }
 
-    @Override
-    public Permission handleUpdatePermission(Permission permissionDTO) {
-        EPermission beModifiedPermission = this.permissionRepository.findById(permissionDTO.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Not found permission by id " + permissionDTO.getId()));
-        EPermission permission = this.mapper.map(permissionDTO, EPermission.class);
-        MergeUtils.mergeObject(permission, beModifiedPermission);
-        beModifiedPermission = this.permissionRepository.save(beModifiedPermission);
-        return this.mapper.map(beModifiedPermission, Permission.class);
-    }
+  @Override
+  public Permission handleUpdatePermission(Permission permission) {
+    EPermission beModifiedPermission = this.permissionRepository.findById(permission.getId())
+        .orElseThrow(() -> new ResourceNotFoundException("Not found permission by id " + permission.getId()));
+    EPermission ePermission = this.mapper.map(permission, EPermission.class);
+    MergeUtils.mergeObject(ePermission, beModifiedPermission);
+    beModifiedPermission = this.permissionRepository.save(beModifiedPermission);
+    return this.mapper.map(beModifiedPermission, Permission.class);
+  }
 
-    @Override
-    public void handleDeletePermission(List<UUID> ids) {
-        this.permissionRepository.deleteByIdIn(ids);
-    }
+  @Override
+  public void handleDeletePermission(List<UUID> ids) {
+    this.permissionRepository.deleteByIdIn(ids);
+  }
 }

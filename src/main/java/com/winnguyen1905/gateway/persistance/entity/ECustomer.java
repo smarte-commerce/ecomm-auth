@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "customers")
-public class ECustomer extends EUser {
-    // @OneToMany(mappedBy = "customer")
-    // Set<ReservationEntity> reservations = new HashSet<>();
+public class ECustomer extends EUserCredentials {
+  // @OneToMany(mappedBy = "customer")
+  // Set<ReservationEntity> reservations = new HashSet<>();
 }

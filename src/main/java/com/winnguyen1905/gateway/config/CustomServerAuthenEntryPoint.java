@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
-public class CustomServerAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
+public class CustomServerAuthenEntryPoint implements ServerAuthenticationEntryPoint {
   private final ObjectMapper objectMapper;
   private final ServerAuthenticationEntryPoint delegate = new BearerTokenServerAuthenticationEntryPoint();
 
@@ -34,8 +34,8 @@ public class CustomServerAuthenticationEntryPoint implements ServerAuthenticatio
         .message("Authentication failed, please check your token")
         .error(
             Optional.ofNullable(authException.getCause())
-              .map(Throwable::getMessage)
-              .orElse(authException.getMessage()))
+                .map(Throwable::getMessage)
+                .orElse(authException.getMessage()))
         .build();
 
     return exchange.getResponse().writeWith(

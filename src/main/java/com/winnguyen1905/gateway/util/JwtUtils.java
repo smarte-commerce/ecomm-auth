@@ -20,7 +20,7 @@ import com.winnguyen1905.gateway.core.model.Permission;
 import com.winnguyen1905.gateway.core.model.Role;
 
 @Component
-@PropertySource("classpath:application-dev.properties")
+// @PropertySource("classpath:application-dev.properties")
 public class JwtUtils {
   public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS256;
 
