@@ -8,27 +8,27 @@ import org.springframework.stereotype.Component;
 // @PropertySource("classpath:application.yaml")
 public class CookieUtils {
 
-  // @Value("${jwt.refresh_token-validity-in-seconds}")
-  // private String jwtRefreshTokenExpiration;
+  @Value("${jwt.refresh_token-validity-in-seconds}")
+  private String jwtRefreshTokenExpiration;
 
-  // public ResponseCookie deleteCookie(String name) {
-  //   return ResponseCookie
-  //       .from(name, "")
-  //       .httpOnly(true)
-  //       .secure(true)
-  //       .path("/")
-  //       .maxAge(0)
-  //       .build();
-  // }
+  public ResponseCookie deleteCookie(String name) {
+    return ResponseCookie
+        .from(name, "")
+        .httpOnly(true)
+        .secure(true)
+        .path("/")
+        .maxAge(0)
+        .build();
+  }
 
-  // public ResponseCookie createCookie(String name, String refreshToken) {
-  //   return ResponseCookie
-  //       .from(name, refreshToken)
-  //       .httpOnly(true)
-  //       .secure(true)
-  //       .path("/")
-  //       .maxAge(Long.parseLong(jwtRefreshTokenExpiration))
-  //       .build();
-  // }
+  public ResponseCookie createCookie(String name, String refreshToken) {
+    return ResponseCookie
+        .from(name, refreshToken)
+        .httpOnly(true)
+        .secure(true)
+        .path("/")
+        .maxAge(Long.parseLong(jwtRefreshTokenExpiration))
+        .build();
+  }
 
 }
