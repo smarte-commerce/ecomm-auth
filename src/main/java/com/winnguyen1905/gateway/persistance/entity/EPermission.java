@@ -7,15 +7,13 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
 @Entity
-@Table(name = "permissions")
+// @Table(name = "permissions")
 public class EPermission extends EBaseAudit {
 
   @Column(nullable = true, name = "name")
@@ -37,8 +35,8 @@ public class EPermission extends EBaseAudit {
 
   private Integer right;
 
-  // @ManyToMany(mappedBy = "permissions", cascade = CascadeType.PERSIST)
-  // private Set<RoleEntity> roles = new HashSet<>();
+  @ManyToMany(mappedBy = "permissions", cascade = CascadeType.PERSIST)
+  private Set<ERole> roles = new HashSet<>();
 
   // @PrePersist
   // protected void prePersist() {
