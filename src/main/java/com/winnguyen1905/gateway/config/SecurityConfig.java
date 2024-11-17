@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +16,7 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @Configuration
+@EnableWebFluxSecurity
 public class SecurityConfig {
   @Bean
   PasswordEncoder passwordEncoder() {
@@ -38,7 +39,7 @@ public class SecurityConfig {
         .authenticationManager(reactiveAuthenticationManager)
         .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
         .authorizeExchange(
-            authorizeExchangeSpec -> authorizeExchangeSpec
+            authorizeExchangeSpec -> authorizeExchangeSpec  
                 .pathMatchers(whiteList).permitAll()
                 .pathMatchers("/ws/events").permitAll()
                 .pathMatchers("/auth/**", "/stripe/**", "/swagger-ui/**", "/api-docs/**",
