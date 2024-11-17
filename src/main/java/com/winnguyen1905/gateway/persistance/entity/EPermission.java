@@ -3,17 +3,18 @@ package com.winnguyen1905.gateway.persistance.entity;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
 @Entity
-// @Table(name = "permissions")
+@Table(name = "permissions")
 public class EPermission extends EBaseAudit {
 
   @Column(nullable = true, name = "name")
@@ -31,17 +32,20 @@ public class EPermission extends EBaseAudit {
   @Column(nullable = true, name = "module")
   private String module;
 
-  private Integer left;
+  // @Column(nullable = true)
+  // private Integer left;
 
-  private Integer right;
+  // @Column(nullable = true)
+  // private Integer right;
 
-  @ManyToMany(mappedBy = "permissions", cascade = CascadeType.PERSIST)
+  @ManyToMany(mappedBy = "permissions")
   private Set<ERole> roles = new HashSet<>();
 
-  // @PrePersist
-  // protected void prePersist() {
-  // String create = this.apiPath + " " + this.method + " " + this.module;
+  @Override
+  @PrePersist
+  protected void prePersist() {
+    String create = this.apiPath + " " + this.method + " " + this.module;
   // this.code = StringUtils.convertCamelToSnake(create);
-  // }
+  }
 
 }

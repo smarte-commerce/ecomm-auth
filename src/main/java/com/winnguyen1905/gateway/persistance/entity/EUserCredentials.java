@@ -11,6 +11,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -71,8 +72,8 @@ public class EUserCredentials extends EBaseAudit {
   // @OneToMany(mappedBy = "receiver")
   // private List<NotificationEntity> receiveds;
 
-  // @PrePersist
-  // protected void prePersist() {
-  // this.status = true;
-  // }
+  @PrePersist
+  protected void prePersist() {
+    this.status = true;
+  }
 }
