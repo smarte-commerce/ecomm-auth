@@ -10,15 +10,4 @@ public class GatewayApplication {
   public static void main(String[] args) {
     SpringApplication.run(GatewayApplication.class, args);
   }
-
-  // @Bean
-  // WebSocketHandlerAdapter webSocketHandlerAdapter() {
-  //   return new WebSocketHandlerAdapter();
-  // }
-
-  // @Bean
-  // public WebProperties.Resources resources() {
-  //   return new WebProperties.Resources();
-  // }
-
 }

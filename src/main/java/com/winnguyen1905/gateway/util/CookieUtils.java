@@ -1,11 +1,12 @@
 package com.winnguyen1905.gateway.util;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 @Component
-// @PropertySource("classpath:application.yaml")
+@PropertySource("classpath:application.yaml")
 public class CookieUtils {
 
   @Value("${jwt.refresh_token-validity-in-seconds}")
