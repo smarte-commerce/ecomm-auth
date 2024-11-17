@@ -3,6 +3,7 @@ package com.winnguyen1905.gateway.persistance.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,8 +26,8 @@ public class ERole extends EBaseAudit {
   @Column(name = "code", unique = true, nullable = false)
   private String code;
 
-  @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "role_detail", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
+  @ManyToMany(fetch = FetchType.EAGER, cascade=CascadeType.PERSIST)
+  @JoinTable(name = "role_details", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
   private Set<EPermission> permissions = new HashSet<>();
 
   @OneToMany(mappedBy = "role")
