@@ -1,6 +1,7 @@
 package com.winnguyen1905.gateway.config;
 
 
+import java.time.Instant;
 import java.util.Map;
 
 import org.springframework.boot.autoconfigure.web.WebProperties;
@@ -16,7 +17,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -51,19 +51,20 @@ public class CustomGlobalExceptionHandler extends AbstractErrorWebExceptionHandl
     Throwable throwable = getError(request);
     HttpStatusCode httpStatus = determineHttpStatus(throwable);
 
+    errorPropertiesMap.put("timestamp", Instant.now().toString());
     errorPropertiesMap.put("status", httpStatus.value());
-    errorPropertiesMap.remove("error");
-    errorPropertiesMap.remove("requestId");
-    errorPropertiesMap.remove("timestamp");
+    errorPropertiesMap.put("error", HttpStatus.valueOf(httpStatus.value()).getReasonPhrase());
+    errorPropertiesMap.put("message", throwable.getMessage());
+    errorPropertiesMap.put("path", request.path());
 
     return ServerResponse.status(httpStatus)
         .contentType(MediaType.APPLICATION_JSON)
-        .body(BodyInserters.fromObject(errorPropertiesMap));
+        .bodyValue(errorPropertiesMap);
   }
 
   private HttpStatusCode determineHttpStatus(Throwable throwable) {
-    if (throwable instanceof ResponseStatusException) {
-      return ((ResponseStatusException) throwable).getStatusCode();
+    if (throwable instanceof ResponseStatusException responseStatusException) {
+      return responseStatusException.getStatusCode();
     } else if (throwable instanceof JwtException || throwable instanceof BadCredentialsException || throwable instanceof UsernameNotFoundException) {
       return HttpStatus.UNAUTHORIZED;
     } else if (throwable instanceof ResourceNotFoundException) {

@@ -17,9 +17,9 @@ import com.winnguyen1905.gateway.core.model.response.RestResponse;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-@Component
 @RequiredArgsConstructor
-public class CustomServerAuthenEntryPoint implements ServerAuthenticationEntryPoint {
+@Component("serverAuthenticationEntryPoint")
+public class CustomServerAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
   private final ObjectMapper objectMapper;
   private final ServerAuthenticationEntryPoint delegate = new BearerTokenServerAuthenticationEntryPoint();
 

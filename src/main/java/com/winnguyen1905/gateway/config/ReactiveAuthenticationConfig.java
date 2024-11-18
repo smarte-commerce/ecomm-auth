@@ -14,7 +14,7 @@ import com.winnguyen1905.gateway.persistance.repository.UserRepository;
 import reactor.core.publisher.Mono;
 
 @Configuration
-public class AuthenticationConfig {
+public class ReactiveAuthenticationConfig {
   @Bean
   ReactiveAuthenticationManager reactiveAuthenticationManager(
       ReactiveUserDetailsService userDetailsService,
