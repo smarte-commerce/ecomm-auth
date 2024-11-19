@@ -15,25 +15,25 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-    private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
+  private final UserRepository userRepository;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public User handleGetUserByUsername(String username) {
-        EUserCredentials user = this.userRepository.findUserByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Not found user by username " + username));
-        return this.modelMapper.map(user, User.class);
-    }
+  @Override
+  public User handleGetUserByUsername(String username) {
+    EUserCredentials user = this.userRepository.findUserByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("Not found user by username " + username));
+    return this.modelMapper.map(user, User.class);
+  }
 
-    @Override
-    public User handleGetUserById(UUID id) {
-      EUserCredentials user = this.userRepository.findById(id)
-            .orElseThrow(() -> (new UsernameNotFoundException("Username does not exist")));
-        return this.modelMapper.map(user, User.class);
-    }
+  @Override
+  public User handleGetUserById(UUID id) {
+    EUserCredentials user = this.userRepository.findById(id)
+        .orElseThrow(() -> (new UsernameNotFoundException("Username does not exist")));
+    return this.modelMapper.map(user, User.class);
+  }
 
-    @Override
-    public User handleUpdateUser(UUID id) {
-        throw new UnsupportedOperationException("Unimplemented method 'handleUpdateUser'");
-    }
+  @Override
+  public User handleUpdateUser(UUID id) {
+    throw new UnsupportedOperationException("Unimplemented method 'handleUpdateUser'");
+  }
 }

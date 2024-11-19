@@ -1,17 +1,14 @@
 package com.winnguyen1905.gateway.core.service;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +30,8 @@ public class PermissionService implements IPermissionService {
   private final ModelMapper mapper;
   private final PermissionConverter permissionConverter;
   private final PermissionRepository permissionRepository;
-  private final Type pagedResponseType = new TypeToken<PagedResponse<Permission>>() {}.getType();
+  private final Type pagedResponseType = new TypeToken<PagedResponse<Permission>>() {
+  }.getType();
 
   @Override
   public PagedResponse<Permission> handleGetPermissions(SearchPermissionRequest permissionSearchRequest,
@@ -47,10 +45,8 @@ public class PermissionService implements IPermissionService {
 
   @Override
   public Permission handleGetPermissionById(UUID id) {
-    return this.mapper.map(
-        this.permissionRepository.findById(id)
-            .orElseThrow(() -> new NotFoundException("Not found permission by id " + id)),
-        Permission.class);
+    return this.mapper.map(this.permissionRepository.findById(id)
+        .orElseThrow(() -> new NotFoundException("Not found permission by id " + id)), Permission.class);
   }
 
   @Override

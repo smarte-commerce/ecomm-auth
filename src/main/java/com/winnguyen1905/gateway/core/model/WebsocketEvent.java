@@ -1,6 +1,10 @@
 package com.winnguyen1905.gateway.core.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Setter
 @Getter
@@ -8,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WebsocketEvent extends AbstractModel {
-    String message;
-    String eventType;
-    String eventSubType;
+  String message;
+  String eventType;
+  String eventSubType;
 }
