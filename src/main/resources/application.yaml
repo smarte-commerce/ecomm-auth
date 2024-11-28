@@ -1,5 +1,5 @@
 server:
-  port: 8091
+  port: 8761
   error:
     include-message: never
 
@@ -8,6 +8,11 @@ management:
     gateway:
       enabled: true
 
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    
 spring:
   cloud:
     gateway:
@@ -38,7 +43,7 @@ spring:
             - PrefixPath=/api
 
   application:
-    name: technologystore
+    name: GATEWAY-REGISTRY
   main:
     web-application-type: reactive
   datasource:

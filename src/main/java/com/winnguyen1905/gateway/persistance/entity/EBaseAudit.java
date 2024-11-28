@@ -15,6 +15,7 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreRemove;
 import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,9 @@ import lombok.Setter;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class EBaseAudit extends EBase {
+  @Version
+  private long version;
+
   @Column(name = "created_by", nullable = true)
   private String createdBy;
 
@@ -46,8 +50,8 @@ public abstract class EBaseAudit extends EBase {
     if (!super.equals(o))
       return false;
     EBaseAudit that = (EBaseAudit) o;
-    return createdBy.equals(that.createdBy) && updatedBy.equals(that.updatedBy) &&
-        createdDate.equals(that.createdDate) && updatedDate.equals(that.updatedDate);
+    return createdBy.equals(that.createdBy) && updatedBy.equals(that.updatedBy) && createdDate.equals(that.createdDate)
+        && updatedDate.equals(that.updatedDate);
   }
 
   @Override

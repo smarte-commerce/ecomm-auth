@@ -47,7 +47,8 @@ public class SecurityConfig {
         // .addFilterBefore(webFilter, SecurityWebFiltersOrder.HTTP_BASIC)
         )
         .oauth2ResourceServer(
-            (oauth2) -> oauth2.jwt(Customizer.withDefaults()).authenticationEntryPoint(serverAuthenticationEntryPoint))
+            (oauth2) -> oauth2.jwt(Customizer.withDefaults())
+                .authenticationEntryPoint(serverAuthenticationEntryPoint))
         .build();
   }
 
