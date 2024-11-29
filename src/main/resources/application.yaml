@@ -1,7 +1,9 @@
 server:
-  port: 8761
+  port: 9191
   error:
     include-message: never
+  servlet:
+      context-path: /api 
 
 management:
   endpoint:
@@ -10,19 +12,26 @@ management:
 
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
-    
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+
 spring:
+  application:
+    name: GATEWAY-SERVICE
+    allow-bean-definition-overriding: true
+
   cloud:
     gateway:
       routes:
-        - id: ecommerce-user
-          uri: http://localhost:8080/
+        - id: PRODUCT-SERVICE
+          uri: lb://PRODUCT-SERVICE
           predicates:
-            - Path=/user/**, /address/**, /user/*/**, /admin/user/**
+            - Path=/products/**, /discount/**, /inventories/**, /variations/**
           filters:
             - PrefixPath=/api
+            
         - id: ecommerce-product
           uri: http://localhost:8081/
           predicates:
@@ -42,8 +51,6 @@ spring:
           filters:
             - PrefixPath=/api
 
-  application:
-    name: GATEWAY-REGISTRY
   main:
     web-application-type: reactive
   datasource:

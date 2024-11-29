@@ -19,6 +19,12 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
+
+  private final String[] whiteList = { 
+    "/eureka",
+    "/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh",
+    "/storage/**", "/api/v1/products/**" };
+
   @Bean
   WebProperties.Resources resources() {
     return new WebProperties.Resources();
@@ -34,21 +40,17 @@ public class SecurityConfig {
       CustomServerAuthenticationEntryPoint serverAuthenticationEntryPoint,
       ReactiveAuthenticationManager reactiveAuthenticationManager) {
 
-    String[] whiteList = { "/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh", "/storage/**",
-        "/api/v1/products/**" };
-
     return http.csrf(ServerHttpSecurity.CsrfSpec::disable).httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
         .authenticationManager(reactiveAuthenticationManager)
         .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-        .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec.pathMatchers(whiteList).permitAll()
+        .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec.pathMatchers(this.whiteList).permitAll()
             .pathMatchers("/ws/events").permitAll()
             .pathMatchers("/auth/**", "/stripe/**", "/swagger-ui/**", "/api-docs/**", "/webjars/**").permitAll()
             .pathMatchers("/admin/**").hasAnyAuthority("ADMIN", "ROLE_ADMIN").anyExchange().authenticated()
         // .addFilterBefore(webFilter, SecurityWebFiltersOrder.HTTP_BASIC)
         )
         .oauth2ResourceServer(
-            (oauth2) -> oauth2.jwt(Customizer.withDefaults())
-                .authenticationEntryPoint(serverAuthenticationEntryPoint))
+            (oauth2) -> oauth2.jwt(Customizer.withDefaults()).authenticationEntryPoint(serverAuthenticationEntryPoint))
         .build();
   }
 
