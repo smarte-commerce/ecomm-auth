@@ -21,8 +21,9 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
   private final String[] whiteList = { 
-    "/eureka",
-    "/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/refresh",
+    "/**",
+    "/auth/register",
+    "/api/auth/**", "/api/v1/auth/login", "/api/v1/auth/refresh",
     "/storage/**", "/api/v1/products/**" };
 
   @Bean
@@ -58,7 +59,7 @@ public class SecurityConfig {
   UrlBasedCorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration
-        .setAllowedOrigins(Arrays.asList("https://locolhost:3000", "https://locolhost:4173", "https://locolhost:5173"));
+        .setAllowedOrigins(Arrays.asList("https://locolhost:3000", "https://locolhost:4173", "*"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
     configuration.setAllowCredentials(true);
     configuration.addAllowedHeader("*");
