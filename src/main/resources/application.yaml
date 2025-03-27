@@ -1,11 +1,72 @@
-spring:
-  application:
-    name: GATEWAY-SERVICE
-  config:
-    import: optional:configserver:http://localhost:8888
+# spring cloud
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+
+server:
+  port: 8090
+  http2:
+    enabled: true
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include:
+          - health
+          - info
+          - env
+          - beans
+          - httptrace
+          - metrics
+          - loggers
+          - threaddump
+          - heapdump
+      base-path: /actuator
+
+spring:
+  application:
+    name: AUTH-SERVICE
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:postgresql://localhost:26257/defaultdb?sslmode=disable
+    username: root
+    password: ""
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create-drop # Change this if needed (create, create-drop, validate, none)
+    # properties:
+    #   hibernate:
+    #     dialect: org.hibernate.dialect.CockroachDB201Dialect # Correct dialect
+    show-sql: true
+
+  sql:
+    init:
+      #   data-locations:
+      #     - classpath:sql/init.sql
+      mode: always
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        data: DEBUG
+        security: DEBUG
+    com:
+      product:
+        service: DEBUG
+    hibernate:
+      SQL: DEBUG
+      type: TRACE
+
+jwt:
+  base64-secret: hl4gDqBxBgOSDWqBlvwFYQInjYRGAdS4lUT7Nf3Zk1nItoSQ9wSFDPU+kXHKcKUW/UKbpGv9bCsa9S/QsoFRHw==
+  access_token-validity-in-seconds: 90000000
+  refresh_token-validity-in-seconds: 100000000

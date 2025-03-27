@@ -1,0 +1,82 @@
+# .
+# spring:
+#   application:
+#     name: GATEWAY-SERVICE
+#   config:
+#     import: optional:configserver:http://localhost:8888
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+
+spring: 
+  application:
+    name: AUTH-SERVICE
+  # rabbitmq:
+  #   host: localhost          # RabbitMQ host (localhost if running on the same machine)
+  #   port: 5672               # Default RabbitMQ port
+  #   username: guest          # Default RabbitMQ username
+  #   password: guest          # Default RabbitMQ password
+  #   virtual-host: /          # Default virtual host ("/")
+  #   listener:
+  #     simple:
+  #       retry:
+  #         enabled: true       # Enable retry for message consumption
+  #         initial-interval: 1000 # Initial retry interval in milliseconds
+  #         max-attempts: 5     # Maximum number of retry attempts
+  #       acknowledge-mode: auto # Auto acknowledgment of messages
+
+  main:
+    web-application-type: reactive
+  datasource:
+    url: jdbc:mysql://localhost:3306/ecommerce
+    username: root
+    password: 2905
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        enable_lazy_load_no_trans: false
+        format_sql: true
+    show-sql: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+    web:
+      pageable:
+        size-parameter: size
+        max-page-size: 100
+        one-indexed-parameters: true
+        page-parameter: page
+      sort:
+        sort-parameter: sort 
+
+  sql:
+    init:
+      mode: always
+  
+jwt:
+  base64-secret: hl4gDqBxBgOSDWqBlvwFYQInjYRGAdS4lUT7Nf3Zk1nItoSQ9wSFDPU+kXHKcKUW/UKbpGv9bCsa9S/QsoFRHw==
+  access_token-validity-in-seconds: 90000000
+  refresh_token-validity-in-seconds: 100000000
