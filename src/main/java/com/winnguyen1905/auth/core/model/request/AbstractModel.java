@@ -8,6 +8,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonInclude(value = Include.NON_NULL)
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public abstract interface AbstractModel extends Serializable {
+// @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
+public interface AbstractModel extends Serializable {
 }

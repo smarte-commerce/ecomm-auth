@@ -5,9 +5,13 @@ import com.winnguyen1905.auth.core.model.request.AbstractModel;
 import com.winnguyen1905.auth.util.TokenPair;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
 @Builder
-public record AuthResponse(TokenPair tokens) implements AbstractModel {
+public record AuthResponse(TokenPair tokens, AccountVm account) implements AbstractModel {
+    @Builder
+    public AuthResponse(TokenPair tokens, AccountVm account) {
+        this.tokens = tokens;
+        this.account = account;
+    }
+
 }

@@ -25,6 +25,28 @@ public record CustomUserDetails(
     String password,
     AccountType role) implements UserDetails {
 
+    @Builder
+    public CustomUserDetails(
+        UUID id,
+        String name,
+        String email,
+        String phone,
+        Boolean status,
+        String lastName,
+        String username,
+        String password,
+        AccountType role) {
+      this.id = id;
+      this.name = name;
+      this.email = email;
+      this.phone = phone;
+      this.status = status;
+      this.lastName = lastName;
+      this.username = username;
+      this.password = password;
+      this.role = role;
+    }
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + this.role.name()));

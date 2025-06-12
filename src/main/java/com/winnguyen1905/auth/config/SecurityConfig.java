@@ -4,6 +4,7 @@ import java.util.Arrays;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -13,10 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-// import org.springframework.web.cors.UrlBasedCorsConfigurationSource as ServletCorsConfigurationSource; // Note the import
 
+@Order(1)
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
@@ -40,7 +40,9 @@ public class SecurityConfig {
       ReactiveAuthenticationManager reactiveAuthenticationManager,
       CustomServerAuthenticationEntryPoint serverAuthenticationEntryPoint) {
 
-    return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+    return http
+        .cors(ServerHttpSecurity.CorsSpec::disable)
+        .csrf(ServerHttpSecurity.CsrfSpec::disable) // CSRF explicitly disabled
         .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
         .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
         .authenticationManager(reactiveAuthenticationManager)
@@ -52,11 +54,9 @@ public class SecurityConfig {
             .anyExchange().authenticated())
         .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())
             .authenticationEntryPoint(serverAuthenticationEntryPoint))
-        .cors(cors -> cors.configurationSource(reactiveCorsConfigurationSource())) // Use reactive CORS
-        .build();
+        .build(); // No .cors() configuration, effectively disabling CORS
   }
 
-  // Reactive CORS configuration for WebFlux
   @Bean
   UrlBasedCorsConfigurationSource reactiveCorsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
@@ -64,25 +64,12 @@ public class SecurityConfig {
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
     configuration.setAllowCredentials(true);
     configuration.addAllowedHeader("*");
-    configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "Accept", "x-no-retry", "x-api-key"));
+    configuration
+        .setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "Accept", "x-no-retry", "x-api-key"));
     configuration.setMaxAge(3600L);
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
   }
-
-  // Servlet CORS configuration for Actuator
-  // @Bean
-  // CorsConfigurationSource corsConfigurationSource() {
-  //   CorsConfiguration configuration = new CorsConfiguration();
-  //   configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000", "https://localhost:4173", "*"));
-  //   configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
-  //   configuration.setAllowCredentials(true);
-  //   configuration.addAllowedHeader("*");
-  //   configuration.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "Accept", "x-no-retry", "x-api-key"));
-  //   configuration.setMaxAge(3600L);
-  //   ServletCorsConfigurationSource source = new ServletCorsConfigurationSource();
-  //   source.registerCorsConfiguration("/**", configuration);
-  //   return source;
-  // }
+  
 }

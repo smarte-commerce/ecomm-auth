@@ -8,11 +8,9 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.winnguyen1905.auth.core.model.response.RestResponse;
 
-import jakarta.servlet.http.HttpServletResponse;
 
 // @ControllerAdvice
 public class RestResponseFilter

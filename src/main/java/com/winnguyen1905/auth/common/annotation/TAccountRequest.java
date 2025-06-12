@@ -13,4 +13,12 @@ public record TAccountRequest(
     String username,
     AccountType role,
     UUID socketClientId) implements AbstractModel {
+    @Builder
+    public TAccountRequest(UUID id, String username, AccountType role, UUID socketClientId) {
+        this.id = id;
+        this.username = username;
+        this.role = role;
+        this.socketClientId = socketClientId;
+    }
+      
 }

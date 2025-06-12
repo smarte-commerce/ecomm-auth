@@ -3,6 +3,8 @@ package com.winnguyen1905.auth.core.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.winnguyen1905.auth.common.annotation.AccountRequest;
+import com.winnguyen1905.auth.common.annotation.TAccountRequest;
 import com.winnguyen1905.auth.common.constant.SystemConstant;
 import com.winnguyen1905.auth.core.model.response.PagedResponse;
 import com.winnguyen1905.auth.core.model.response.PermissionVm;
@@ -30,12 +32,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import reactor.core.publisher.Mono;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("permissions")
 public class PermissionController {
   // @Autowired
   // private IPermissionService permissionService;
+
+  @GetMapping("/path")
+  public String getMethodName(@AccountRequest TAccountRequest param) {
+      return new String();
+  }
+  
 
   // @GetMapping
   // public ResponseEntity<PagedResponse<Permission>> getPermissions(

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.winnguyen1905.auth.common.constant.AccountType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,9 +16,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -25,39 +30,40 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @Entity
 @SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "accounts", schema = "public")
 public class EAccountCredentials {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "id", updatable = false, nullable = false)
   protected UUID id;
 
-  @Column(name = "account_name")
-  private String name;
-
-  @Column(name = "account_username")
+  @Column(name = "username")
   private String username;
 
-  @Column(name = "account_password")
+  @Column(name = "password")
   private String password;
 
-  @Column(name = "account_status")
+  @Column(name = "status")
   private Boolean status;
 
-  @Column(name = "account_email")
-  private String email;
-
-  @Column(name = "account_phone")
-  private String phone;
-
-  @Column(name = "account_type")
+  @Column(name = "role_code")
   @Enumerated(EnumType.STRING)
   private AccountType accountType;
 
-  @Column(name = "account_refresh_token")
+  @Column(name = "last_token", length = 1024)
   private String refreshToken;
 
-  @ManyToOne
-  @JoinColumn(name = "role_id")
-  private ERole role;
+  @OneToOne(mappedBy = "accountCredentials", cascade = CascadeType.ALL)
+  private ECustomer customer;
+
+  @OneToOne(mappedBy = "accountCredentials", cascade = CascadeType.ALL)
+  private EVendor vendor;
+
+  @PrePersist
+  public void prePersist() {
+    if (this.id == null) {
+      this.id = UUID.randomUUID();
+    }
+  }
 }

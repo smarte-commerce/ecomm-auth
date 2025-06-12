@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+'<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -14,11 +14,26 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>auth</name>
   <description>Demo project for Spring Boot</description>
+  <url />
+  <licenses>
+    <license />
+  </licenses>
+  <developers>
+    <developer />
+  </developers>
+  <scm>
+    <connection />
+    <developerConnection />
+    <tag />
+    <url />
+  </scm>
   <properties>
     <java.version>21</java.version>
+    <!-- <grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
+    <grpc.version>1.62.2</grpc.version>
+    <protobuf.version>3.25.3</protobuf.version> -->
   </properties>
   <dependencies>
-    <!-- Spring Cloud -->
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
@@ -27,26 +42,38 @@
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-bus-amqp</artifactId>
     </dependency>
-
-    <!-- WebFlux (Remove spring-boot-starter-web) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webflux</artifactId>
     </dependency>
 
-    <!-- Utilities -->
+    <!-- spring boot -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.modelmapper</groupId>
       <artifactId>modelmapper</artifactId>
       <version>3.2.1</version>
     </dependency>
+
+    <!-- <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency> -->
+
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <scope>provided</scope>
     </dependency>
 
-    <!-- Security -->
+    <!-- security -->
+    <!-- <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-oauth2-jose</artifactId>
+    </dependency> -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
@@ -66,15 +93,11 @@
       <version>0.7.0</version>
     </dependency>
 
-    <!-- Database -->
+    <!-- db -->
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>42.7.3</version>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-relational</artifactId>
+      <version>3.4.4</version>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
@@ -85,7 +108,49 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <!-- grpc -->
+    <!-- <dependency>
+      <groupId>net.devh</groupId>
+      <artifactId>grpc-server-spring-boot-starter</artifactId>
+      <version>${grpc-spring-boot-starter.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-protobuf</artifactId>
+      <version>${grpc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-stub</artifactId>
+      <version>${grpc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.salesforce.servicelibs</groupId>
+      <artifactId>reactor-grpc-stub</artifactId>
+      <version>1.2.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.salesforce.servicelibs</groupId>
+      <artifactId>reactor-grpc</artifactId>
+      <version>1.2.3</version>
+    </dependency> -->
   </dependencies>
+
 
   <dependencyManagement>
     <dependencies>
@@ -98,15 +163,21 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
   <build>
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.7.1</version>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
+        <version>3.13.0</version> <!-- Adjusted to 3.13.0 -->
         <configuration>
-          <release>21</release>
+          <release>21</release> <!-- Changed from 23 to 21 -->
           <annotationProcessorPaths>
             <path>
               <groupId>org.projectlombok</groupId>
@@ -120,9 +191,29 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <!-- Protobuf Compiler Plugin -->
+      <!-- <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <version>0.6.1</version>
+        <configuration>
+          <protocArtifact>
+            com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+          <pluginId>grpc-java</pluginId>
+          <pluginArtifact>
+            io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>compile-custom</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin> -->
     </plugins>
   </build>
-
   <repositories>
     <repository>
       <id>spring-snapshots</id>
@@ -143,7 +234,6 @@
       </releases>
     </pluginRepository>
   </pluginRepositories>
+
 </project>
-
-
-
+'

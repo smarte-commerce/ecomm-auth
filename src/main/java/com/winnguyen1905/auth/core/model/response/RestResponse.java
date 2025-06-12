@@ -10,5 +10,14 @@ public record RestResponse<T>(
   String error,
   Object message,
   Integer statusCode
-) implements AbstractModel {}
+) implements AbstractModel {
+
+    @Builder
+    public RestResponse(T data, String error, Object message, Integer statusCode) {
+        this.data = data;
+        this.error = error;
+        this.message = message;
+        this.statusCode = statusCode;
+    }
+}
 

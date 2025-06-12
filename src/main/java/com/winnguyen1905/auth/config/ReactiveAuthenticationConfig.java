@@ -31,8 +31,9 @@ public class ReactiveAuthenticationConfig {
         .map(user -> CustomUserDetails.builder()
             .id(user.getId())
             .role(user.getAccountType())
-            .email(user.getEmail())
-            .phone(user.getPhone())
+            .status(user.getStatus())
+            // .email(user.getEmail())
+            // .phone(user.getPhone())
             .username(user.getUsername())
             .password(user.getPassword())
             .build());

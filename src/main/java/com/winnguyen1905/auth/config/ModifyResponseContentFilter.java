@@ -29,7 +29,7 @@ public class ModifyResponseContentFilter implements WebFilter {
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
     return chain.filter(exchange)
-        .then(Mono.defer(() -> handleResponse(exchange)));
+        .then(handleResponse(exchange));
   }
 
   private Mono<Void> handleResponse(ServerWebExchange exchange) {

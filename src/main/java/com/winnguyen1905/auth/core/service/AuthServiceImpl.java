@@ -7,7 +7,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ServerWebExchange;
 
+import com.winnguyen1905.auth.common.constant.AccountType;
 import com.winnguyen1905.auth.core.model.request.LoginRequest;
 import com.winnguyen1905.auth.core.model.request.RegisterRequest;
 import com.winnguyen1905.auth.core.model.response.AccountVm;
@@ -15,6 +17,8 @@ import com.winnguyen1905.auth.core.model.response.AuthResponse;
 import com.winnguyen1905.auth.core.model.response.CustomUserDetails;
 import com.winnguyen1905.auth.exception.ResourceAlreadyExistsException;
 import com.winnguyen1905.auth.persistance.entity.EAccountCredentials;
+import com.winnguyen1905.auth.persistance.entity.ECustomer;
+import com.winnguyen1905.auth.persistance.entity.EVendor;
 import com.winnguyen1905.auth.persistance.repository.RoleRepository;
 import com.winnguyen1905.auth.persistance.repository.UserRepository;
 import com.winnguyen1905.auth.util.JwtUtils;
@@ -36,12 +40,12 @@ public class AuthServiceImpl implements AuthService {
   private final ReactiveAuthenticationManager authenticationManager;
 
   @Override
-  public Mono<AuthResponse> login(LoginRequest loginRequest) {
+  public Mono<AuthResponse> login(LoginRequest loginRequest, ServerWebExchange exchange) {
     return authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()))
-        .cast(CustomUserDetails.class)
+        .map(authentication -> (CustomUserDetails) authentication.getPrincipal())
         .flatMap(userDetails -> {
-          TokenPair tokenPair = jwtUtils.createTokenPair(userDetails);
+          TokenPair tokenPair = jwtUtils.createTokenPair(userDetails, exchange);
           return Mono.fromCallable(() -> userRepository.findById(userDetails.id()))
               .flatMap(optionalUser -> Mono.justOrEmpty(optionalUser))
               .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
@@ -53,10 +57,11 @@ public class AuthServiceImpl implements AuthService {
                             .accessToken(tokenPair.accessToken())
                             .refreshToken(tokenPair.refreshToken())
                             .build())
-                        // .user(AccountVm.builder()
-                        // .username(savedCredentials.getUsername())
-                        // .email(savedCredentials.getEmail())
-                        // .build())
+                        .account(AccountVm.builder()
+                            .id(savedCredentials.getId())
+                            .accountType(savedCredentials.getAccountType())
+                            .username(savedCredentials.getUsername())
+                            .build())
                         .build());
               });
         });
@@ -69,11 +74,34 @@ public class AuthServiceImpl implements AuthService {
     if (user.isPresent()) {
       throw new ResourceAlreadyExistsException("Username already exists");
     }
-    EAccountCredentials newAccount = EAccountCredentials.builder()
+
+    EAccountCredentials.EAccountCredentialsBuilder newAccount = EAccountCredentials.builder()
+        .accountType(registerRequest.accountType())
         .username(registerRequest.username())
-        .password(passwordEncoder.encode(registerRequest.password()))
-        .build();
-    return Mono.fromCallable(() -> this.userRepository.save(newAccount)).then();
+        .status(true)
+        .password(passwordEncoder.encode(registerRequest.password()));
+
+    if (registerRequest.accountType() == AccountType.CUSTOMER) {
+      ECustomer newCustomer = ECustomer.builder()
+          .customerName(registerRequest.fullName())
+          .customerAddress(registerRequest.address())
+          .customerEmail(registerRequest.email())
+          .customerPhone(registerRequest.phone())
+          .customerStatus(true)
+          .build();
+      newAccount.customer(newCustomer);
+    } else if (registerRequest.accountType() == AccountType.VENDOR) {
+      EVendor newVendor = EVendor.builder()
+          .vendorName(registerRequest.fullName())
+          .vendorAddress(registerRequest.address())
+          .vendorEmail(registerRequest.email())
+          .vendorPhone(registerRequest.phone())
+          .vendorStatus(true)
+          .build();
+      newAccount.vendor(newVendor);
+    }
+
+    return Mono.fromCallable(() -> this.userRepository.save(newAccount.build())).then();
   }
 
   private void validateRegisterRequest(RegisterRequest request) {
