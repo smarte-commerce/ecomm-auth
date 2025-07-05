@@ -8,26 +8,26 @@ import lombok.Builder;
 
 @Builder
 public record PagedResponse<T>(
-    int maxPageItems,
-    int page,
-    int size,
-    List<T> results,
-    int totalElements,
-    int totalPages) implements AbstractModel {
+    List<T> content,
+    int pageNumber,
+    int pageSize,
+    long totalElements,
+    int totalPages,
+    boolean last) implements AbstractModel {
 
     @Builder
     public PagedResponse(
-        int maxPageItems,
-        int page,
-        int size,
-        List<T> results,
-        int totalElements,
-        int totalPages) {
-      this.maxPageItems = maxPageItems;
-      this.page = page;
-      this.size = size;
-      this.results = results;
+        List<T> content,
+        int pageNumber,
+        int pageSize,
+        long totalElements,
+        int totalPages,
+        boolean last) {
+      this.content = content;
+      this.pageNumber = pageNumber;
+      this.pageSize = pageSize;
       this.totalElements = totalElements;
       this.totalPages = totalPages;
+      this.last = last;
     }
 }
