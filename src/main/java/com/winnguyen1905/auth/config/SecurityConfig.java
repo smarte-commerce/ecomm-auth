@@ -1,6 +1,7 @@
 package com.winnguyen1905.auth.config;
 
 import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,8 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
@@ -21,8 +24,15 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
+  @Value("${keycloak.direct-access-grants-enabled:true}")
+  private boolean keycloakEnabled;
+
+  @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri:}")
+  private String jwkSetUri;
+
   public static final String[] whiteList = {
-      "/**", "/auth/register", "/auth/**", "/v1/auth/login", "/v1/auth/refresh", "/storage/**", "/v1/products/**" };
+      "/**", "/auth/register", "/auth/**", "/auth/oauth2/**", "/v1/auth/login", "/v1/auth/refresh", 
+      "/storage/**", "/v1/products/**", "/actuator/**" };
 
   @Bean
   WebProperties.Resources resources() {
@@ -40,7 +50,7 @@ public class SecurityConfig {
       ReactiveAuthenticationManager reactiveAuthenticationManager,
       CustomServerAuthenticationEntryPoint serverAuthenticationEntryPoint) {
 
-    return http
+    ServerHttpSecurity configuredHttp = http
         .cors(ServerHttpSecurity.CorsSpec::disable)
         .csrf(ServerHttpSecurity.CsrfSpec::disable) // CSRF explicitly disabled
         .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
@@ -50,11 +60,46 @@ public class SecurityConfig {
         .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
             .pathMatchers(SecurityConfig.whiteList).permitAll()
             .pathMatchers("/ws/events").permitAll()
-            .pathMatchers("/auth/**", "/stripe/**", "/swagger-ui/**", "-docs/**", "/webjars/**").permitAll()
+            .pathMatchers("/auth/**", "/auth/oauth2/**", "/stripe/**", "/swagger-ui/**", "-docs/**", "/webjars/**").permitAll()
             .anyExchange().authenticated())
-        .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults())
-            .authenticationEntryPoint(serverAuthenticationEntryPoint))
-        .build(); // No .cors() configuration, effectively disabling CORS
+        .oauth2ResourceServer(oauth2 -> {
+          if (keycloakEnabled && jwkSetUri != null && !jwkSetUri.isEmpty()) {
+            // Use Keycloak JWT validation
+            oauth2.jwt(jwt -> jwt.jwtDecoder(keycloakJwtDecoder()));
+          } else {
+            // Use default JWT validation (local)
+            oauth2.jwt(Customizer.withDefaults());
+          }
+          oauth2.authenticationEntryPoint(serverAuthenticationEntryPoint);
+        });
+
+    // Add OAuth2 client configuration if Keycloak is enabled
+    if (keycloakEnabled) {
+      configuredHttp = configuredHttp.oauth2Client(Customizer.withDefaults());
+    }
+
+    return configuredHttp.build();
+  }
+
+  /**
+   * JWT Decoder for Keycloak tokens
+   */
+  @Bean
+  ReactiveJwtDecoder keycloakJwtDecoder() {
+    if (keycloakEnabled && jwkSetUri != null && !jwkSetUri.isEmpty()) {
+      return NimbusReactiveJwtDecoder.withJwkSetUri(jwkSetUri).build();
+    } else {
+      // Fallback to default decoder
+      return NimbusReactiveJwtDecoder.withJwkSetUri("http://localhost:8080/realms/microservice/protocol/openid-connect/certs").build();
+    }
+  }
+
+  /**
+   * WebClient builder for Keycloak service
+   */
+  @Bean
+  org.springframework.web.reactive.function.client.WebClient.Builder webClientBuilder() {
+    return org.springframework.web.reactive.function.client.WebClient.builder();
   }
 
   @Bean
