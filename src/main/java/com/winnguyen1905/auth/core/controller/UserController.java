@@ -29,7 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("users")
 public class UserController {
-  
+
   private final AccountServiceInterface accountService;
 
   @GetMapping("/{username}")
@@ -45,7 +45,7 @@ public class UserController {
     return this.accountService.getUserById(id)
         .map(user -> ResponseEntity.ok(user));
   }
-  
+
   @GetMapping
   @ResponseMessage(message = "Get all users success")
   public Mono<ResponseEntity<PagedResponse<AccountVm>>> getAllUsers(
@@ -53,83 +53,83 @@ public class UserController {
       @RequestParam(defaultValue = "10") int size,
       @RequestParam(defaultValue = "username") String sortBy,
       @RequestParam(defaultValue = "asc") String sortDir) {
-    
+
     return this.accountService.getAllUsers(page, size, sortBy, sortDir)
         .map(response -> ResponseEntity.ok(response));
   }
-  
+
   @GetMapping("/search")
   @ResponseMessage(message = "Search users success")
   public Mono<ResponseEntity<PagedResponse<AccountVm>>> searchUsers(
       @RequestParam String keyword,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size) {
-    
+
     return this.accountService.searchUsers(keyword, page, size)
         .map(response -> ResponseEntity.ok(response));
   }
-  
+
   @PostMapping
   @ResponseMessage(message = "Create user success")
   public Mono<ResponseEntity<AccountVm>> createUser(@RequestBody AccountVm accountVm) {
     return this.accountService.createUser(accountVm)
         .map(user -> ResponseEntity.status(HttpStatus.CREATED).body(user));
   }
-  
+
   @PutMapping("/{id}")
   @ResponseMessage(message = "Update user success")
   public Mono<ResponseEntity<AccountVm>> updateUser(
       @PathVariable UUID id,
       @RequestBody AccountVm accountVm) {
-    
+
     return this.accountService.updateUser(id, accountVm)
         .map(user -> ResponseEntity.ok(user));
   }
-  
+
   @DeleteMapping("/{id}")
   @ResponseMessage(message = "Delete user success")
   public Mono<ResponseEntity<Void>> deleteUser(@PathVariable UUID id) {
     return this.accountService.deleteUser(id)
         .thenReturn(ResponseEntity.noContent().build());
   }
-  
+
   @DeleteMapping
   @ResponseMessage(message = "Delete multiple users success")
   public Mono<ResponseEntity<Void>> deleteUsers(@RequestBody List<UUID> ids) {
     return this.accountService.deleteUsers(ids)
         .thenReturn(ResponseEntity.noContent().build());
   }
-  
+
   @PatchMapping("/{id}/activate")
   @ResponseMessage(message = "Activate user success")
   public Mono<ResponseEntity<AccountVm>> activateUser(@PathVariable UUID id) {
     return this.accountService.activateUser(id)
         .map(user -> ResponseEntity.ok(user));
   }
-  
+
   @PatchMapping("/{id}/deactivate")
   @ResponseMessage(message = "Deactivate user success")
   public Mono<ResponseEntity<AccountVm>> deactivateUser(@PathVariable UUID id) {
     return this.accountService.deactivateUser(id)
         .map(user -> ResponseEntity.ok(user));
   }
-  
+
   @PatchMapping("/{accountId}/customer/{customerId}")
   @ResponseMessage(message = "Assign customer to account success")
   public Mono<ResponseEntity<AccountVm>> assignCustomerToAccount(
       @PathVariable UUID accountId,
       @PathVariable UUID customerId) {
-    
+
     return this.accountService.assignCustomerToAccount(accountId, customerId)
         .map(account -> ResponseEntity.ok(account));
   }
-  
+
   @PatchMapping("/{accountId}/vendor/{vendorId}")
   @ResponseMessage(message = "Assign vendor to account success")
   public Mono<ResponseEntity<AccountVm>> assignVendorToAccount(
       @PathVariable UUID accountId,
       @PathVariable UUID vendorId) {
-    
+
     return this.accountService.assignVendorToAccount(accountId, vendorId)
         .map(account -> ResponseEntity.ok(account));
   }

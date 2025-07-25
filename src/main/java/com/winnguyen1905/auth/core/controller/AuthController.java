@@ -116,7 +116,7 @@ public class AuthController {
    */
   @GetMapping("/oauth2/callback")
   @ResponseMessage(message = "OAuth2 authentication success")
-  public Mono<ResponseEntity<?>> handleOAuth2Callback(
+  public Mono<ResponseEntity<Object>> handleOAuth2Callback(
       @RequestParam String code,
       @RequestParam(defaultValue = "http://localhost:8092/auth/oauth2/callback") String redirectUri,
       ServerWebExchange exchange) {
@@ -130,7 +130,7 @@ public class AuthController {
     return keycloakService.exchangeCodeForTokens(code, redirectUri)
         .map(tokenPair -> {
           // Set cookies and redirect to frontend
-          String frontendUrl = "http://localhost:3000/dashboard"; // Configure this
+          String frontendUrl = "http://localhost:3000/dashboard"; // Configure this hểr
 
           return ResponseEntity.status(HttpStatus.FOUND)
               .location(URI.create(frontendUrl))
@@ -141,7 +141,7 @@ public class AuthController {
               .build();
         })
         .doOnError(error -> log.error("Failed to exchange authorization code for tokens", error))
-        .onErrorReturn((ResponseEntity<?>) ResponseEntity.status(HttpStatus.FOUND)
+        .onErrorReturn(ResponseEntity.status(HttpStatus.FOUND)
             .location(URI.create("http://localhost:3000/login?error=oauth_failed"))
             .build());
   }
