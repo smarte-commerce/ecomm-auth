@@ -29,79 +29,79 @@ import java.util.UUID;
 @RequestMapping("shops")
 public class ShopController {
   
-  private final ShopServiceInterface shopService;
+  // private final ShopServiceInterface shopService;
 
-  @GetMapping("/health")
-  @ResponseMessage(message = "Shop service health check")
-  public Mono<ResponseEntity<String>> healthCheck() {
-    return Mono.just(ResponseEntity.ok("Shop service is healthy"));
-  }
+  // @GetMapping("/health")
+  // @ResponseMessage(message = "Shop service health check")
+  // public Mono<ResponseEntity<String>> healthCheck() {
+  //   return Mono.just(ResponseEntity.ok("Shop service is healthy"));
+  // }
   
-  @GetMapping("/{id}")
-  @ResponseMessage(message = "Get shop by id success")
-  public Mono<ResponseEntity<ShopVm>> getShopById(@PathVariable UUID id) {
-    return this.shopService.getShopById(id)
-        .map(shop -> ResponseEntity.ok(shop));
-  }
+  // @GetMapping("/{id}")
+  // @ResponseMessage(message = "Get shop by id success")
+  // public Mono<ResponseEntity<ShopVm>> getShopById(@PathVariable UUID id) {
+  //   return this.shopService.getShopById(id)
+  //       .map(shop -> ResponseEntity.ok(shop));
+  // }
   
-  @GetMapping
-  @ResponseMessage(message = "Get all shops success")
-  public Mono<ResponseEntity<PagedResponse<ShopVm>>> getAllShops(
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size,
-      @RequestParam(defaultValue = "name") String sortBy,
-      @RequestParam(defaultValue = "asc") String sortDir) {
+  // @GetMapping
+  // @ResponseMessage(message = "Get all shops success")
+  // public Mono<ResponseEntity<PagedResponse<ShopVm>>> getAllShops(
+  //     @RequestParam(defaultValue = "0") int page,
+  //     @RequestParam(defaultValue = "10") int size,
+  //     @RequestParam(defaultValue = "name") String sortBy,
+  //     @RequestParam(defaultValue = "asc") String sortDir) {
     
-    return this.shopService.getAllShops(page, size, sortBy, sortDir)
-        .map(response -> ResponseEntity.ok(response));
-  }
+  //   return this.shopService.getAllShops(page, size, sortBy, sortDir)
+  //       .map(response -> ResponseEntity.ok(response));
+  // }
   
-  @GetMapping("/search")
-  @ResponseMessage(message = "Search shops success")
-  public Mono<ResponseEntity<PagedResponse<ShopVm>>> searchShops(
-      @RequestParam String keyword,
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size) {
+  // @GetMapping("/search")
+  // @ResponseMessage(message = "Search shops success")
+  // public Mono<ResponseEntity<PagedResponse<ShopVm>>> searchShops(
+  //     @RequestParam String keyword,
+  //     @RequestParam(defaultValue = "0") int page,
+  //     @RequestParam(defaultValue = "10") int size) {
     
-    return this.shopService.searchShops(keyword, page, size)
-        .map(response -> ResponseEntity.ok(response));
-  }
+  //   return this.shopService.searchShops(keyword, page, size)
+  //       .map(response -> ResponseEntity.ok(response));
+  // }
   
-  @GetMapping("/vendor/{vendorId}")
-  @ResponseMessage(message = "Get shops by vendor id success")
-  public Mono<ResponseEntity<List<ShopVm>>> getShopsByVendorId(@PathVariable UUID vendorId) {
-    return this.shopService.getShopsByVendorId(vendorId)
-        .map(shops -> ResponseEntity.ok(shops));
-  }
+  // @GetMapping("/vendor/{vendorId}")
+  // @ResponseMessage(message = "Get shops by vendor id success")
+  // public Mono<ResponseEntity<List<ShopVm>>> getShopsByVendorId(@PathVariable UUID vendorId) {
+  //   return this.shopService.getShopsByVendorId(vendorId)
+  //       .map(shops -> ResponseEntity.ok(shops));
+  // }
   
-  @PostMapping
-  @ResponseMessage(message = "Create shop success")
-  public Mono<ResponseEntity<ShopVm>> createShop(@RequestBody ShopVm shopVm) {
-    return this.shopService.createShop(shopVm)
-        .map(shop -> ResponseEntity.status(HttpStatus.CREATED).body(shop));
-  }
+  // @PostMapping
+  // @ResponseMessage(message = "Create shop success")
+  // public Mono<ResponseEntity<ShopVm>> createShop(@RequestBody ShopVm shopVm) {
+  //   return this.shopService.createShop(shopVm)
+  //       .map(shop -> ResponseEntity.status(HttpStatus.CREATED).body(shop));
+  // }
   
-  @PutMapping("/{id}")
-  @ResponseMessage(message = "Update shop success")
-  public Mono<ResponseEntity<ShopVm>> updateShop(
-      @PathVariable UUID id,
-      @RequestBody ShopVm shopVm) {
+  // @PutMapping("/{id}")
+  // @ResponseMessage(message = "Update shop success")
+  // public Mono<ResponseEntity<ShopVm>> updateShop(
+  //     @PathVariable UUID id,
+  //     @RequestBody ShopVm shopVm) {
     
-    return this.shopService.updateShop(id, shopVm)
-        .map(shop -> ResponseEntity.ok(shop));
-  }
+  //   return this.shopService.updateShop(id, shopVm)
+  //       .map(shop -> ResponseEntity.ok(shop));
+  // }
   
-  @DeleteMapping("/{id}")
-  @ResponseMessage(message = "Delete shop success")
-  public Mono<ResponseEntity<Void>> deleteShop(@PathVariable UUID id) {
-    return this.shopService.deleteShop(id)
-        .thenReturn(ResponseEntity.noContent().build());
-  }
+  // @DeleteMapping("/{id}")
+  // @ResponseMessage(message = "Delete shop success")
+  // public Mono<ResponseEntity<Void>> deleteShop(@PathVariable UUID id) {
+  //   return this.shopService.deleteShop(id)
+  //       .thenReturn(ResponseEntity.noContent().build());
+  // }
   
-  @DeleteMapping
-  @ResponseMessage(message = "Delete multiple shops success")
-  public Mono<ResponseEntity<Void>> deleteShops(@RequestBody List<UUID> ids) {
-    return this.shopService.deleteShops(ids)
-        .thenReturn(ResponseEntity.noContent().build());
-  }
+  // @DeleteMapping
+  // @ResponseMessage(message = "Delete multiple shops success")
+  // public Mono<ResponseEntity<Void>> deleteShops(@RequestBody List<UUID> ids) {
+  //   return this.shopService.deleteShops(ids)
+  //       .thenReturn(ResponseEntity.noContent().build());
+  // }
 }

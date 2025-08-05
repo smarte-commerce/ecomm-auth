@@ -2,12 +2,12 @@ package com.winnguyen1905.auth.config;
 
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,7 +31,7 @@ public class SecurityConfig {
   private String jwkSetUri;
 
   public static final String[] whiteList = {
-      "/**", "/auth/register", "/auth/**", "/auth/oauth2/**", "/v1/auth/login", "/v1/auth/refresh", 
+      "/auth/register", "/auth/**", "/auth/oauth2/**", "/v1/auth/login", "/v1/auth/refresh",
       "/storage/**", "/v1/products/**", "/actuator/**" };
 
   @Bean
@@ -48,7 +48,8 @@ public class SecurityConfig {
   SecurityWebFilterChain springWebFilterChain(
       ServerHttpSecurity http,
       ReactiveAuthenticationManager reactiveAuthenticationManager,
-      CustomServerAuthenticationEntryPoint serverAuthenticationEntryPoint) {
+      CustomServerAuthenticationEntryPoint serverAuthenticationEntryPoint,
+      ReactiveJwtDecoder jwtDecoder) {
 
     ServerHttpSecurity configuredHttp = http
         .cors(ServerHttpSecurity.CorsSpec::disable)
@@ -60,23 +61,19 @@ public class SecurityConfig {
         .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
             .pathMatchers(SecurityConfig.whiteList).permitAll()
             .pathMatchers("/ws/events").permitAll()
-            .pathMatchers("/auth/**", "/auth/oauth2/**", "/stripe/**", "/swagger-ui/**", "-docs/**", "/webjars/**").permitAll()
+            .pathMatchers("/auth/**", "/auth/oauth2/**", "/stripe/**", "/swagger-ui/**", "-docs/**", "/webjars/**")
+            .permitAll()
             .anyExchange().authenticated())
         .oauth2ResourceServer(oauth2 -> {
-          if (keycloakEnabled && jwkSetUri != null && !jwkSetUri.isEmpty()) {
-            // Use Keycloak JWT validation
-            oauth2.jwt(jwt -> jwt.jwtDecoder(keycloakJwtDecoder()));
-          } else {
-            // Use default JWT validation (local)
-            oauth2.jwt(Customizer.withDefaults());
-          }
+          // Use the injected JWT decoder (Keycloak JWT validation)
+          oauth2.jwt(jwt -> jwt.jwtDecoder(jwtDecoder));
           oauth2.authenticationEntryPoint(serverAuthenticationEntryPoint);
         });
 
-    // Add OAuth2 client configuration if Keycloak is enabled
-    if (keycloakEnabled) {
-      configuredHttp = configuredHttp.oauth2Client(Customizer.withDefaults());
-    }
+    // OAuth2 client temporarily disabled for local development
+    // if (keycloakEnabled) {
+    // configuredHttp = configuredHttp.oauth2Client(Customizer.withDefaults());
+    // }
 
     return configuredHttp.build();
   }
@@ -85,12 +82,14 @@ public class SecurityConfig {
    * JWT Decoder for Keycloak tokens
    */
   @Bean
+  @ConditionalOnProperty(name = "keycloak.direct-access-grants-enabled", havingValue = "true")
   ReactiveJwtDecoder keycloakJwtDecoder() {
     if (keycloakEnabled && jwkSetUri != null && !jwkSetUri.isEmpty()) {
       return NimbusReactiveJwtDecoder.withJwkSetUri(jwkSetUri).build();
     } else {
-      // Fallback to default decoder
-      return NimbusReactiveJwtDecoder.withJwkSetUri("http://localhost:8080/realms/microservice/protocol/openid-connect/certs").build();
+      // Fallback to master realm (default Keycloak setup)
+      return NimbusReactiveJwtDecoder.withJwkSetUri("http://localhost:8087/realms/master/protocol/openid-connect/certs")
+          .build();
     }
   }
 
@@ -116,5 +115,5 @@ public class SecurityConfig {
     source.registerCorsConfiguration("/**", configuration);
     return source;
   }
-  
+
 }
