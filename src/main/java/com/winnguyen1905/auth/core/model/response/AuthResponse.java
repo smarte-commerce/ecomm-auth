@@ -7,11 +7,13 @@ import com.winnguyen1905.auth.util.TokenPair;
 import lombok.Builder;
 
 @Builder
-public record AuthResponse(TokenPair tokens, AccountVm account) implements AbstractModel {
-    @Builder
-    public AuthResponse(TokenPair tokens, AccountVm account) {
-        this.tokens = tokens;
-        this.account = account;
-    }
-
-}
+public record AuthResponse(
+  String accessToken,
+  String refreshToken,
+  String idToken,
+  int expiresIn,
+  int refreshExpiresIn,
+  String tokenType,
+  String scope,
+  AccountVm account
+) implements AbstractModel {}

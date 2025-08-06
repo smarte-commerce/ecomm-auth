@@ -26,7 +26,6 @@ import com.winnguyen1905.auth.core.service.AuthService;
 import com.winnguyen1905.auth.core.service.KeycloakService;
 import com.winnguyen1905.auth.util.CookieUtils;
 import com.winnguyen1905.auth.util.SecurityUtils;
-import com.winnguyen1905.auth.util.TokenPair;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,14 +55,14 @@ public class AuthController {
             .ok()
             .header(
                 HttpHeaders.SET_COOKIE, CookieUtils
-                    .createCookie(SystemConstant.REFRESH_TOKEN, authenResponse.tokens().refreshToken())
+                    .createCookie(SystemConstant.REFRESH_TOKEN, authenResponse.refreshToken())
                     .toString())
             .body(authenResponse));
   }
 
   @PostMapping("/register")
   @ResponseMessage(message = "Register success")
-  public Mono<ResponseEntity<Void>> register(@Valid @RequestBody RegisterRequest registerRequest) {
+  public Mono<ResponseEntity<Void>> register(@RequestBody RegisterRequest registerRequest) {
     return this.authService.register(registerRequest)
         .then(Mono.just(ResponseEntity.status(HttpStatus.CREATED).build()));
   }
@@ -74,7 +73,10 @@ public class AuthController {
     return Mono.justOrEmpty(SecurityUtils.getCurrentUserLogin())
         .switchIfEmpty(Mono.error(new UsernameNotFoundException("Not found username")))
         .flatMap(username -> this.accountService.getUserByUsername(username))
-        .map(user -> ResponseEntity.ok(AuthResponse.builder().account(user).build()));
+        .map(user -> ResponseEntity.ok(
+            AuthResponse.builder()
+                .account(user)
+                .build()));
   }
 
   @PostMapping("/logout")
@@ -127,17 +129,17 @@ public class AuthController {
 
     log.info("Handling OAuth2 callback with code: {}", code.substring(0, Math.min(code.length(), 10)) + "...");
 
-    return keycloakService.exchangeCodeForTokens(code, redirectUri)
-        .map(tokenPair -> {
+    return keycloakService.exchangeCodeForTokensFullResponse(code, redirectUri)
+        .map(authResponse -> {
           // Set cookies and redirect to frontend
           String frontendUrl = "http://localhost:3000/dashboard"; // Configure this hểr
 
           return ResponseEntity.status(HttpStatus.FOUND)
               .location(URI.create(frontendUrl))
               .header(HttpHeaders.SET_COOKIE,
-                  CookieUtils.createCookie(SystemConstant.REFRESH_TOKEN, tokenPair.refreshToken()).toString())
+                  CookieUtils.createCookie(SystemConstant.REFRESH_TOKEN, authResponse.refreshToken()).toString())
               .header(HttpHeaders.SET_COOKIE,
-                  CookieUtils.createCookie("access_token", tokenPair.accessToken()).toString())
+                  CookieUtils.createCookie("access_token", authResponse.accessToken()).toString())
               .build();
         })
         .doOnError(error -> log.error("Failed to exchange authorization code for tokens", error))
@@ -151,7 +153,7 @@ public class AuthController {
    */
   @PostMapping("/refresh")
   @ResponseMessage(message = "Token refresh success")
-  public Mono<ResponseEntity<TokenPair>> refreshToken(
+  public Mono<ResponseEntity<AuthResponse>> refreshToken(
       @CookieValue(name = SystemConstant.REFRESH_TOKEN, required = false) String refreshToken) {
 
     if (!directAccessGrantsEnabled) {
@@ -165,11 +167,11 @@ public class AuthController {
 
     log.info("Refreshing access token");
 
-    return keycloakService.refreshToken(refreshToken)
-        .map(tokenPair -> ResponseEntity.ok()
+    return keycloakService.refreshTokenFullResponse(refreshToken)
+        .map(authResponse -> ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE,
-                CookieUtils.createCookie(SystemConstant.REFRESH_TOKEN, tokenPair.refreshToken()).toString())
-            .body(tokenPair))
+                CookieUtils.createCookie(SystemConstant.REFRESH_TOKEN, authResponse.refreshToken()).toString())
+            .body(authResponse))
         .doOnError(error -> log.error("Failed to refresh token", error))
         .onErrorReturn(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
   }

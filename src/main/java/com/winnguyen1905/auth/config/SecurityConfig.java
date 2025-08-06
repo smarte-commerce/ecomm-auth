@@ -7,21 +7,21 @@ import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
-import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Order(1)
 @Configuration
-@EnableWebFluxSecurity
+@EnableWebSecurity
 public class SecurityConfig {
 
   @Value("${keycloak.direct-access-grants-enabled:true}")
@@ -29,10 +29,6 @@ public class SecurityConfig {
 
   @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri:}")
   private String jwkSetUri;
-
-  public static final String[] whiteList = {
-      "/auth/register", "/auth/**", "/auth/oauth2/**", "/v1/auth/login", "/v1/auth/refresh",
-      "/storage/**", "/v1/products/**", "/actuator/**" };
 
   @Bean
   WebProperties.Resources resources() {
@@ -45,37 +41,22 @@ public class SecurityConfig {
   }
 
   @Bean
-  SecurityWebFilterChain springWebFilterChain(
-      ServerHttpSecurity http,
-      ReactiveAuthenticationManager reactiveAuthenticationManager,
-      CustomServerAuthenticationEntryPoint serverAuthenticationEntryPoint,
-      ReactiveJwtDecoder jwtDecoder) {
-
-    ServerHttpSecurity configuredHttp = http
-        .cors(ServerHttpSecurity.CorsSpec::disable)
-        .csrf(ServerHttpSecurity.CsrfSpec::disable) // CSRF explicitly disabled
-        .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-        .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
-        .authenticationManager(reactiveAuthenticationManager)
-        .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-        .authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
-            .pathMatchers(SecurityConfig.whiteList).permitAll()
-            .pathMatchers("/ws/events").permitAll()
-            .pathMatchers("/auth/**", "/auth/oauth2/**", "/stripe/**", "/swagger-ui/**", "-docs/**", "/webjars/**")
-            .permitAll()
-            .anyExchange().authenticated())
-        .oauth2ResourceServer(oauth2 -> {
-          // Use the injected JWT decoder (Keycloak JWT validation)
-          oauth2.jwt(jwt -> jwt.jwtDecoder(jwtDecoder));
-          oauth2.authenticationEntryPoint(serverAuthenticationEntryPoint);
-        });
-
-    // OAuth2 client temporarily disabled for local development
-    // if (keycloakEnabled) {
-    // configuredHttp = configuredHttp.oauth2Client(Customizer.withDefaults());
-    // }
-
-    return configuredHttp.build();
+  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http
+        .cors(cors -> cors.disable())
+        .csrf(csrf -> csrf.disable()) // CSRF explicitly disabled
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(authz -> authz
+            .requestMatchers("/auth/register", "/auth/login", "/auth/oauth2/**", "/v1/auth/register").permitAll()
+            .requestMatchers("/ws/events").permitAll()
+            .requestMatchers("/swagger-ui/**", "*-docs/**", "/webjars/**").permitAll()
+            .anyRequest().authenticated())
+        .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
+          if (keycloakEnabled) {
+            jwt.decoder(keycloakJwtDecoder());
+          }
+        }))
+        .build();
   }
 
   /**
@@ -83,12 +64,12 @@ public class SecurityConfig {
    */
   @Bean
   @ConditionalOnProperty(name = "keycloak.direct-access-grants-enabled", havingValue = "true")
-  ReactiveJwtDecoder keycloakJwtDecoder() {
+  JwtDecoder keycloakJwtDecoder() {
     if (keycloakEnabled && jwkSetUri != null && !jwkSetUri.isEmpty()) {
-      return NimbusReactiveJwtDecoder.withJwkSetUri(jwkSetUri).build();
+      return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     } else {
       // Fallback to master realm (default Keycloak setup)
-      return NimbusReactiveJwtDecoder.withJwkSetUri("http://localhost:8087/realms/master/protocol/openid-connect/certs")
+      return NimbusJwtDecoder.withJwkSetUri("http://localhost:8087/realms/master/protocol/openid-connect/certs")
           .build();
     }
   }
@@ -102,7 +83,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  UrlBasedCorsConfigurationSource reactiveCorsConfigurationSource() {
+  CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000", "https://localhost:4173", "*"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));

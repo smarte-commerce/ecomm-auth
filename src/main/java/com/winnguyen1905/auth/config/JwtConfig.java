@@ -7,6 +7,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,8 +15,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
@@ -24,7 +23,6 @@ import com.winnguyen1905.auth.exception.BaseException;
 import com.winnguyen1905.auth.util.SecurityUtils;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Configuration
 public class JwtConfig {
@@ -42,19 +40,19 @@ public class JwtConfig {
   }
 
   @Bean
+  @ConditionalOnProperty(name = "keycloak.direct-access-grants-enabled", havingValue = "false", matchIfMissing = true)
   ReactiveJwtDecoder jwtDecoder() {
     NimbusReactiveJwtDecoder nimbusJwtDecoder = NimbusReactiveJwtDecoder
         .withSecretKey(secretKey())
         .macAlgorithm(SecurityUtils.JWT_ALGORITHM)
         .build();
-    System.out.println(jwtKey);
+    
     return token -> {
       try {
-        System.out.println(jwtKey);
         return nimbusJwtDecoder.decode(token);
       } catch (Exception e) {
-        System.out.println("Token error: " + token);
-        throw new BaseException("refresh token invalid", 401);
+        System.out.println("JWT Token decoding error for token: " + token.substring(0, Math.min(token.length(), 20)) + "...");
+        throw new BaseException("JWT token invalid", 401);
       }
     };
   }
