@@ -9,17 +9,20 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record RegisterRequest(
-    @NotBlank(message = "username not be blank") @Pattern(regexp = "^[a-zA-Z0-9]{8,20}$", message = "username must be of 8 to 20 length with no special characters") String username,
+    // @NotBlank(message = "username not be blank") @Pattern(regexp = "^[a-zA-Z0-9]{8,20}$", message = "username must be of 8 to 20 length with no special characters") 
+    String username,
 
-    @NotBlank @Size(min = 8, message = "The password must be length >= 8") String password,
+    // @NotBlank @Size(min = 8, message = "The password must be length >= 8")
+    String password,
 
-    @NotBlank @Email(message = "Email format invalid") String email,
+    // @NotBlank @Email(message = "Email format invalid") 
+    String email,
 
     String phone,
 
-    @NotBlank String fullName,
+     String fullName,
 
-    @NotNull AccountType accountType,
+      AccountType accountType,
 
     String address
 ) implements AbstractModel {}

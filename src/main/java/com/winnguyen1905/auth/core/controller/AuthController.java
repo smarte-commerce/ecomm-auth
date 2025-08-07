@@ -48,8 +48,8 @@ public class AuthController {
 
   @PostMapping("/login")
   @ResponseMessage(message = "Login success")
-  public Mono<ResponseEntity<AuthResponse>> login(@RequestBody LoginRequest loginRequest, ServerWebExchange exchange) {
-    return this.authService.login(loginRequest, exchange)
+  public Mono<ResponseEntity<AuthResponse>> login(@RequestBody LoginRequest loginRequest) {
+    return this.authService.login(loginRequest, null)
         .subscribeOn(Schedulers.boundedElastic())
         .map(authenResponse -> ResponseEntity
             .ok()
