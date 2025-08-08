@@ -16,6 +16,13 @@ public interface KeycloakService {
     Mono<TokenPair> authenticateWithKeycloak(LoginRequest loginRequest);
     
     /**
+     * Authenticate user with Keycloak using username/password (full response)
+     * @param loginRequest containing username and password
+     * @return AuthResponse with all token details from Keycloak
+     */
+    Mono<AuthResponse> authenticateWithKeycloakFullResponse(LoginRequest loginRequest);
+    
+    /**
      * Register a new user in Keycloak
      * @param registerRequest containing user details
      * @return success indication
@@ -28,6 +35,13 @@ public interface KeycloakService {
      * @return new TokenPair
      */
     Mono<TokenPair> refreshToken(String refreshToken);
+    
+    /**
+     * Refresh access token using refresh token (full response)
+     * @param refreshToken the refresh token
+     * @return AuthResponse with all token details
+     */
+    Mono<AuthResponse> refreshTokenFullResponse(String refreshToken);
     
     /**
      * Logout user from Keycloak
@@ -50,4 +64,12 @@ public interface KeycloakService {
      * @return TokenPair with access and refresh tokens
      */
     Mono<TokenPair> exchangeCodeForTokens(String code, String redirectUri);
+    
+    /**
+     * Exchange authorization code for tokens (full response)
+     * @param code authorization code
+     * @param redirectUri redirect URI used in authorization
+     * @return AuthResponse with all token details
+     */
+    Mono<AuthResponse> exchangeCodeForTokensFullResponse(String code, String redirectUri);
 } 

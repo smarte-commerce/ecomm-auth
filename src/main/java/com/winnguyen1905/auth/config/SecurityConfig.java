@@ -7,21 +7,18 @@ import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Order(1)
 @Configuration
-@EnableWebSecurity
+@EnableWebFluxSecurity
 public class SecurityConfig {
 
   @Value("${keycloak.direct-access-grants-enabled:true}")
@@ -41,19 +38,20 @@ public class SecurityConfig {
   }
 
   @Bean
-  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
     return http
-        .cors(cors -> cors.disable())
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(csrf -> csrf.disable()) // CSRF explicitly disabled
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(authz -> authz
-            .requestMatchers("/auth/register", "/auth/login", "/auth/oauth2/**", "/v1/auth/register").permitAll()
-            .requestMatchers("/ws/events").permitAll()
-            .requestMatchers("/swagger-ui/**", "*-docs/**", "/webjars/**").permitAll()
-            .anyRequest().authenticated())
+        .authorizeExchange(authz -> authz
+            .pathMatchers("/auth/register", "/auth/login", "/auth/oauth2/**", "/v1/auth/register").permitAll()
+            .pathMatchers("/auth/status", "/auth/health", "/health").permitAll()
+            .pathMatchers("/ws/events").permitAll()
+            .pathMatchers("/swagger-ui/**", "*-docs/**", "/webjars/**").permitAll()
+            .pathMatchers("/actuator/**").permitAll()
+            .anyExchange().authenticated())
         .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
           if (keycloakEnabled) {
-            jwt.decoder(keycloakJwtDecoder());
+            jwt.jwtDecoder(keycloakJwtDecoder());
           }
         }))
         .build();
@@ -64,12 +62,12 @@ public class SecurityConfig {
    */
   @Bean
   @ConditionalOnProperty(name = "keycloak.direct-access-grants-enabled", havingValue = "true")
-  JwtDecoder keycloakJwtDecoder() {
+  ReactiveJwtDecoder keycloakJwtDecoder() {
     if (keycloakEnabled && jwkSetUri != null && !jwkSetUri.isEmpty()) {
-      return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
+      return NimbusReactiveJwtDecoder.withJwkSetUri(jwkSetUri).build();
     } else {
       // Fallback to master realm (default Keycloak setup)
-      return NimbusJwtDecoder.withJwkSetUri("http://localhost:8087/realms/master/protocol/openid-connect/certs")
+      return NimbusReactiveJwtDecoder.withJwkSetUri("http://localhost:8087/realms/master/protocol/openid-connect/certs")
           .build();
     }
   }
@@ -83,7 +81,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  CorsConfigurationSource corsConfigurationSource() {
+  org.springframework.web.cors.reactive.CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000", "https://localhost:4173", "*"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"));
@@ -92,7 +90,7 @@ public class SecurityConfig {
     configuration
         .setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "Accept", "x-no-retry", "x-api-key"));
     configuration.setMaxAge(3600L);
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
   }
