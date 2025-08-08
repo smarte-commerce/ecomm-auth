@@ -48,8 +48,8 @@ public class AuthController {
 
   @PostMapping("/login")
   @ResponseMessage(message = "Login success")
-  public Mono<ResponseEntity<AuthResponse>> login(@RequestBody LoginRequest loginRequest) {
-    return this.authService.login(loginRequest, null)
+  public Mono<ResponseEntity<AuthResponse>> login(@RequestBody LoginRequest loginRequest, ServerWebExchange exchange) {
+    return this.authService.login(loginRequest, exchange)
         .subscribeOn(Schedulers.boundedElastic())
         .map(authenResponse -> ResponseEntity
             .ok()
@@ -185,6 +185,15 @@ public class AuthController {
     return Mono.justOrEmpty(SecurityUtils.getCurrentUserLogin())
         .map(username -> ResponseEntity.ok().body(new AuthStatusResponse(true, username)))
         .defaultIfEmpty(ResponseEntity.ok().body(new AuthStatusResponse(false, null)));
+  }
+
+  /**
+   * Simple health check endpoint - no authentication required
+   */
+  @GetMapping("/health")
+  @ResponseMessage(message = "Service is healthy")
+  public Mono<ResponseEntity<String>> healthCheck() {
+    return Mono.just(ResponseEntity.ok("Auth service is running"));
   }
 
   // Helper record for auth status response
