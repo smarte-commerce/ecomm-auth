@@ -6,8 +6,6 @@ import com.winnguyen1905.auth.common.constant.AccountType;
 import com.winnguyen1905.auth.core.model.request.AbstractModel;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
 public record AccountVm(
     UUID id,
