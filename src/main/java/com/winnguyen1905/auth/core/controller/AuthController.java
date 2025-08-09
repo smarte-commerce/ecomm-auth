@@ -27,7 +27,6 @@ import com.winnguyen1905.auth.core.service.KeycloakService;
 import com.winnguyen1905.auth.util.CookieUtils;
 import com.winnguyen1905.auth.util.SecurityUtils;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -49,15 +48,35 @@ public class AuthController {
   @PostMapping("/login")
   @ResponseMessage(message = "Login success")
   public Mono<ResponseEntity<AuthResponse>> login(@RequestBody LoginRequest loginRequest, ServerWebExchange exchange) {
-    return this.authService.login(loginRequest, exchange)
-        .subscribeOn(Schedulers.boundedElastic())
-        .map(authenResponse -> ResponseEntity
-            .ok()
-            .header(
-                HttpHeaders.SET_COOKIE, CookieUtils
-                    .createCookie(SystemConstant.REFRESH_TOKEN, authenResponse.refreshToken())
-                    .toString())
-            .body(authenResponse));
+    try {
+      return this.authService.login(loginRequest, exchange)
+          .subscribeOn(Schedulers.boundedElastic())
+          .map(authenResponse -> createLoginResponse(authenResponse))
+          .doOnError(throwable -> log.error("Login failed: {}", throwable.getMessage(), throwable))
+          .onErrorReturn(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    } catch (Exception e) {
+      log.error("Error initiating login: {}", e.getMessage(), e);
+      return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+    }
+  }
+
+  private ResponseEntity<AuthResponse> createLoginResponse(AuthResponse authenResponse) {
+    try {
+      if (authenResponse != null && authenResponse.refreshToken() != null && !authenResponse.refreshToken().isEmpty()) {
+        String cookieValue = CookieUtils
+            .createCookie(SystemConstant.REFRESH_TOKEN, authenResponse.refreshToken())
+            .toString();
+        
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, cookieValue)
+            .body(authenResponse);
+      } else {
+        return ResponseEntity.ok().body(authenResponse);
+      }
+    } catch (Exception e) {
+      log.warn("Could not create refresh token cookie, returning response without cookie: {}", e.getMessage());
+      return ResponseEntity.ok().body(authenResponse);
+    }
   }
 
   @PostMapping("/register")

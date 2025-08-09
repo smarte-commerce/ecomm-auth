@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
   private final ReactiveAuthenticationManager authenticationManager;
   private final KeycloakService keycloakService;
 
-  @Value("${keycloak.direct-access-grants-enabled:true}")
+  @Value("${keycloak.direct-access-grants-enabled}")
   private boolean directAccessGrantsEnabled;
 
   @Override
@@ -49,7 +49,6 @@ public class AuthServiceImpl implements AuthService {
   // TODO: no need to create new user here, just authenticate with Keycloak
   public Mono<AuthResponse> login(LoginRequest loginRequest, ServerWebExchange exchange) {
     log.info("Login attempt for user: {}", loginRequest.username());
-
     if (directAccessGrantsEnabled) {
       // Use Keycloak for authentication
       return keycloakService.authenticateWithKeycloakFullResponse(loginRequest)
@@ -104,28 +103,33 @@ public class AuthServiceImpl implements AuthService {
           new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password()))
           .map(authentication -> (CustomUserDetails) authentication.getPrincipal())
           .flatMap(userDetails -> {
-            TokenPair tokenPair = jwtUtils.createTokenPair(userDetails, exchange);
-            return Mono.fromCallable(() -> userRepository.findById(userDetails.id()))
-                .flatMap(optionalUser -> Mono.justOrEmpty(optionalUser))
-                .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
-                .flatMap(userCredentials -> {
-                  userCredentials.setRefreshToken(tokenPair.refreshToken());
-                  return Mono.fromCallable(() -> userRepository.save(userCredentials))
-                      .map(savedCredentials -> AuthResponse.builder()
-                          .accessToken(tokenPair.accessToken())
-                          .refreshToken(tokenPair.refreshToken())
-                          .idToken(null) // Local JWT doesn't have ID token
-                          .expiresIn(3600) // Default 1 hour
-                          .refreshExpiresIn(1800) // Default 30 minutes
-                          .tokenType("Bearer")
-                          .scope("openid profile email")
-                          .account(AccountVm.builder()
-                              .id(savedCredentials.getId())
-                              .accountType(savedCredentials.getAccountType())
-                              .username(savedCredentials.getUsername())
-                              .build())
-                          .build());
-                });
+            try {
+              TokenPair tokenPair = jwtUtils.createTokenPair(userDetails, exchange);
+              return Mono.fromCallable(() -> userRepository.findById(userDetails.id()))
+                  .flatMap(optionalUser -> Mono.justOrEmpty(optionalUser))
+                  .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
+                  .flatMap(userCredentials -> {
+                    userCredentials.setRefreshToken(tokenPair.refreshToken());
+                    return Mono.fromCallable(() -> userRepository.save(userCredentials))
+                        .map(savedCredentials -> AuthResponse.builder()
+                            .accessToken(tokenPair.accessToken())
+                            .refreshToken(tokenPair.refreshToken())
+                            .idToken(null) // Local JWT doesn't have ID token
+                            .expiresIn(3600) // Default 1 hour
+                            .refreshExpiresIn(1800) // Default 30 minutes
+                            .tokenType("Bearer")
+                            .scope("openid profile email")
+                            .account(AccountVm.builder()
+                                .id(savedCredentials.getId())
+                                .accountType(savedCredentials.getAccountType())
+                                .username(savedCredentials.getUsername())
+                                .build())
+                            .build());
+                  });
+            } catch (Exception e) {
+              log.error("Failed to create token pair for user {}", loginRequest.username(), e);
+              return Mono.error(new RuntimeException("Failed to create authentication tokens", e));
+            }
           });
     }
   }
@@ -144,44 +148,44 @@ public class AuthServiceImpl implements AuthService {
         .accountType(registerRequest.accountType())
         .username(registerRequest.username())
         .status(true)
-        .password(passwordEncoder.encode(registerRequest.password()));
-
+        .customer(new ECustomer())
+        .vendor(new EVendor())
+        .password(passwordEncoder.encode(registerRequest.password())).build();
+    newAccount.getCustomer().setAccountCredentials(newAccount);
+    newAccount.getVendor().setAccountCredentials(newAccount);
     // if (registerRequest.accountType() == AccountType.CUSTOMER) {
-    //   ECustomer newCustomer = ECustomer.builder()
-    //       .customerName(registerRequest.fullName())
-    //       .customerAddress(registerRequest.address())
-    //       .customerEmail(registerRequest.email())
-    //       .customerPhone(registerRequest.phone())
-    //       .customerStatus(true)
-    //       .build();
-    //   newAccount.customer(newCustomer);
+    // ECustomer newCustomer = ECustomer.builder()
+    // .customerName(registerRequest.fullName())
+    // .customerAddress(registerRequest.address())
+    // .customerEmail(registerRequest.email())
+    // .customerPhone(registerRequest.phone())
+    // .customerStatus(true)
+    // .build();
+    // newAccount.customer(newCustomer);
     // } else if (registerRequest.accountType() == AccountType.VENDOR) {
-    //   EVendor newVendor = EVendor.builder()
-    //       .vendorName(registerRequest.fullName())
-    //       .vendorAddress(registerRequest.address())
-    //       .vendorEmail(registerRequest.email())
-    //       .vendorPhone(registerRequest.phone())
-    //       .vendorStatus(true)
-    //       .build();
-    //   newAccount.vendor(newVendor);
+    // EVendor newVendor = EVendor.builder()
+    // .vendorName(registerRequest.fullName())
+    // .vendorAddress(registerRequest.address())
+    // .vendorEmail(registerRequest.email())
+    // .vendorPhone(registerRequest.phone())
+    // .vendorStatus(true)
+    // .build();
+    // newAccount.vendor(newVendor);
     // }
-    Optional<EAccountCredentials> existingUser = this.userRepository.findUserByUsername(registerRequest.username());
-    this.userRepository.save(newAccount.build());
-    return Mono.empty();
+    // return Mono.empty();
 
-    // Register user in both Keycloak and local database
-    // if (directAccessGrantsEnabled) {
-    //   return keycloakService.registerUserInKeycloak(registerRequest)
-    //       .then(Mono.fromCallable(() -> this.userRepository.save(newAccount.build()))).then()
-    //       .doOnSuccess(v -> log.info("Successfully registered user {} in both Keycloak and local database",
-    //           registerRequest.username()))
-    //       .doOnError(error -> log.error("Failed to register user {} in Keycloak", registerRequest.username(), error));
-    // } else {
-    //   // Only register locally if Keycloak is disabled
-    //   return Mono.fromCallable(() -> this.userRepository.save(newAccount.build()))
-    //       .then()
-    //       .doOnSuccess(v -> log.info("Successfully registered user {} in local database", registerRequest.username()));
-    // }
+    if (directAccessGrantsEnabled) {
+      return keycloakService.registerUserInKeycloak(registerRequest)
+          .then(Mono.fromCallable(() -> this.userRepository.save(newAccount))).then()
+          .doOnSuccess(v -> log.info("Successfully registered user {} in both Keycloak and local database",
+              registerRequest.username()))
+          .doOnError(error -> log.error("Failed to register user {} in Keycloak", registerRequest.username(), error));
+    } else {
+      // Only register locally if Keycloak is disabled
+      return Mono.fromCallable(() -> this.userRepository.save(newAccount))
+          .then()
+          .doOnSuccess(v -> log.info("Successfully registered user {} in local database", registerRequest.username()));
+    }
   }
 
   private void validateRegisterRequest(RegisterRequest request) {
